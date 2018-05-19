@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: NotYourNass
+service: DownloadThisVideo
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -20,6 +20,7 @@ service: NotYourNass
 provider:
   name: aws
   runtime: nodejs8.10
+  memorySize: 128
 
 # you can overwrite defaults here
 #  stage: dev
@@ -42,8 +43,14 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    TWITTER_CONSUMER_KEY:
+    TWITTER_CONSUMER_SECRET:
+    TWITTER_ACCESS_TOKEN:
+    TWITTER_ACCESS_TOKEN_SECRET:
+    REDIS_HOSTNAME:
+    REDIS_PORT:
+    REDIS_PASSWORD:
 
 # you can add packaging information here
 #package:
@@ -55,18 +62,10 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
-
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
-#    events:
-#      - http:
-#          path: users/create
-#          method: get
-#      - s3: ${env:BUCKET}
-#      - schedule: rate(10 minutes)
+  fetchTweetsToDownload:
+    handler: handler.fetchTweetsToDownload
+    events:
+      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
 #      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
 #      - alexaSkill
@@ -82,23 +81,3 @@ functions:
 #            detail:
 #              state:
 #                - pending
-#      - cloudwatchLog: '/aws/lambda/hello'
-#      - cognitoUserPool:
-#          pool: MyUserPool
-#          trigger: PreSignUp
-
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"

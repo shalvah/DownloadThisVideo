@@ -1,16 +1,28 @@
 'use strict';
 
-module.exports.hello = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Go Serverless v1.0! Your function executed successfully!',
-      input: event,
-    }),
-  };
+const queue = require('./src/queue');
+const twitter = require('./src/twitter');
 
-  callback(null, response);
+module.exports.fetchTweetsToDownload = async (event, context, callback) => {
+    let mentions = await twitter.getMentions();
 
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // callback(null, { message: 'Go Serverless v1.0! Your function executed successfully!', event });
+    if (!mentions.length) {
+        const response = {
+            statusCode: 200,
+            body: 'No new mentions'
+        };
+        callback(null, response);
+        queue.close();
+        return;
+    }
+
+    queue.mark('lastTweetRetrieved', mentions[0]);
+    await queue.push(mentions);
+    const response = {
+        statusCode: 200,
+        body: `Queued ${mentions.length} tweets`
+    };
+    callback(null, response);
+    queue.close();
 };
+

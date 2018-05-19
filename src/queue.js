@@ -17,8 +17,17 @@ async function push(items) {
     return await client.lpushAsync(waitQueue, items);
 }
 
-async function nextTask(items) {
-    return await client.rpoplpushAsync(waitQueue, workQueue, items);
+async function nextTask() {
+    return await client.rpoplpushAsync(waitQueue, workQueue);
+}
+
+async function hasTask(items) {
+    let tasks = await client.existsAsync(waitQueue);
+    if (!tasks) {
+        return false;
+    }
+    tasks = await client.lrangeAsync(waitQueue, 0, 1);
+    return tasks && tasks.length;
 }
 
 async function mark(key, value) {
@@ -36,6 +45,7 @@ function close() {
 module.exports = {
     push,
     nextTask,
+    hasTask,
     mark,
     marker,
     close

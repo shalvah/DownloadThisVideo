@@ -6,3 +6,4 @@ jspm_packages
 .serverless
 
 .idea/
+package-lock.json

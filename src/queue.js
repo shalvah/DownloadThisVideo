@@ -3,25 +3,17 @@
 const waitQueue = 'Wait';
 const workQueue = 'Work';
 
-const redis = require("redis");
-require('bluebird').promisifyAll(redis.RedisClient.prototype);
-
-let client;
-
-(async function init() {
-    client = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNAME, {no_ready_check: true});
-    await client.authAsync(process.env.REDIS_PASSWORD);
-})();
+const client = require('./cache');
 
 async function push(items) {
-    return await client.lpushAsync(waitQueue, items);
+    return await client.lpushAsync(waitQueue, items.map(JSON.stringify));
 }
 
 async function nextTask() {
-    return await client.rpoplpushAsync(waitQueue, workQueue);
+    return await client.rpoplpushAsync(waitQueue, workQueue).then(JSON.parse);
 }
 
-async function hasTask(items) {
+async function hasTask() {
     let tasks = await client.existsAsync(waitQueue);
     if (!tasks) {
         return false;
@@ -30,23 +22,13 @@ async function hasTask(items) {
     return tasks && tasks.length;
 }
 
-async function mark(key, value) {
-    return await client.setAsync(key, value);
-}
-
-async function marker(key) {
-    return await client.getAsync(key);
-}
-
-function close() {
-    return client.quit();
+async function taskDone() {
+    return await client.rpopAsync(workQueue);
 }
 
 module.exports = {
     push,
     nextTask,
     hasTask,
-    mark,
-    marker,
-    close
+    taskDone
 };

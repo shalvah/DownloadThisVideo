@@ -2,6 +2,8 @@
 
 const cache = require('./cache');
 const not = require('./utils').not;
+const and = require('./utils').and;
+const message = require('./utils').randomSuccessResponse;
 const Twit = require('twit');
 
 const t = new Twit({
@@ -20,7 +22,7 @@ const getMentions = async () => {
     }
     return t.get('statuses/mentions_timeline', options)
         .then(r => r.data)
-        .then(tweets => tweets.filter(isTweetAReply))
+        .then(tweets => tweets.filter(and(isTweetAReply, not(isTweetAReplyToMe))))
         .then(tweets => tweets.map(tweet => {
             return {
                 id: tweet.id_str,
@@ -52,7 +54,7 @@ const getVideoLink = async ({ referencing_tweet }) => {
 const replyWithLink = async (tweet, link) => {
     let options = {
         in_reply_to_status_id: tweet.id,
-        status: `@${tweet.author} Here you go! ${link}`
+        status: `@${tweet.author} ${message()} ${link}`
     };
     return t.post('statuses/update', options);
 };
@@ -65,13 +67,16 @@ const replyWithError = async (tweet, message) => {
     return t.post('statuses/update', options);
 };
 
-const isTweetAReply = (tweet) => {
-    return !!tweet.in_reply_to_status_id_str;
-};
+const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
+
+const isTweetAReplyToMe = (tweet) => tweet.in_reply_to_screen_name === process.env.TWITTER_SCREEN_NAME;
+
+const shouldDownloadVid = (tweet) => true;
 
 module.exports = {
     getMentions,
     getVideoLink,
     replyWithLink,
-    replyWithError
+    replyWithError,
+    shouldDownloadVid
 };

@@ -24,16 +24,16 @@ module.exports.sendDownloadLinks = async (event, context, callback) => {
     let taskCount = 0;
     while (await queue.hasTask()) {
         let tweet = await queue.nextTask();
-        let link = await twitter.getVideoLink(tweet);
-        if (!link) {
-            twitter.replyWithError(tweet, 'No video or GIF in this tweet');
-        } else {
-            await Promise.all([
-                cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
-                twitter.replyWithLink(tweet, link),
-            ]);
+        if (twitter.shouldDownloadVid(tweet)) {
+            let link = await twitter.getVideoLink(tweet);
+            if (link) {
+                await Promise.all([
+                    cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
+                    twitter.replyWithLink(tweet, link),
+                ]);
+            }
         }
-        queue.taskDone()
+        queue.taskDone();
         taskCount++;
     }
 

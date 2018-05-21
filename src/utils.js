@@ -11,7 +11,6 @@ const finish = (cb) => {
                 body
             };
             cb(null, response);
-            require('./cache').quit();
         }
     }
 };

@@ -59,24 +59,19 @@ const replyWithLink = async (tweet, link) => {
     return t.post('statuses/update', options);
 };
 
-const replyWithError = async (tweet, message) => {
-    let options = {
-        in_reply_to_status_id: tweet.id,
-        status: `@${tweet.author} ${message}`
-    };
-    return t.post('statuses/update', options);
-};
-
 const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
 
 const isTweetAReplyToMe = (tweet) => tweet.in_reply_to_screen_name === process.env.TWITTER_SCREEN_NAME;
 
+// I'd like to add another layer of redundancy to prevent processing tweets
+// we've already replied to
+// but cant think of a way to do that now
+// without making multiple API calls
 const shouldDownloadVid = (tweet) => true;
 
 module.exports = {
     getMentions,
     getVideoLink,
     replyWithLink,
-    replyWithError,
     shouldDownloadVid
 };

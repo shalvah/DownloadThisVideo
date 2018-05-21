@@ -15,6 +15,7 @@ There are two Lambda Functions:
 ### Notes
 - Retrieved video links are cached in Redis
 - Task Queue implemented with Redis
+- Why 10 minute intervals? So as to not hit Twitter's rate limits and minimize AWS Lambda usage time, while being near-realtime. An alternate implementation would be to use Twitter's Streaming API. However, this wouldn't work with AWS Lambda (max runtime of a function is 300 seconds), so I'd need to maintain a dedicated server for that.
 
 ## Todo
 - Refactor `sendDownloadLinks` so it dispatches a separate Lambda function for each task, in order to prevent the function tiiming out. On the other hand, we'd need to be careful, as this can result in hitting Twitter's rate limits. (Priority: :arrow_up:)

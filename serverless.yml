@@ -1,14 +1,17 @@
 service: DownloadThisVideo
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
-
 provider:
   name: aws
   runtime: nodejs8.10
   stage: beta
   memorySize: 128
+  timeout: 30
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource:
+        - ${self:custom.snsArn}
 
   environment:
     TWITTER_CONSUMER_KEY:
@@ -19,13 +22,20 @@ provider:
     REDIS_PORT:
     REDIS_PASSWORD:
     TWITTER_SCREEN_NAME:
-
+    TOPIC_ARN: ${self:custom.snsArn}
 functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload
     events:
-      - schedule: rate(10 minutes)
-  sendDownloadLinks:
-    handler: handler.sendDownloadLinks
+      - schedule: rate(5 minutes)
+  retryFailedTasks:
+    handler: handler.retryFailedTasks
     events:
       - schedule: rate(10 minutes)
+  sendDownloadLink:
+    handler: handler.sendDownloadLink
+    events:
+      - sns: newMention
+
+custom:
+  snsArn: "arn:aws:sns:#{AWS::AccountRegion}:#{AWS::AccountId}:newMention"

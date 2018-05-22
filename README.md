@@ -4,20 +4,22 @@ Easily download videos/GIFs off Twitter. Mention the bot (@this_vid) in a reply 
 ## How this works
 ## Stack
 - [AWS Lambda](https://aws.amazon.com/lambda/) with the [Serverless Framework](http://serverless.com)
+- [AWS SNS](http://aws.amazon.com/sns)
 - [Redis](http://redis.io)
 - Node.js 8.10
 
 ### Implementation
-There are two Lambda Functions:
-- **fetchTweetsToDownload** runs every 10 minutes and checks for new mentions. It puts any valid mentions found in the task queue and exits.
-- **sendDownloadLinks** runs every 10 minutes. It checks if there are any tasks in the queue, and then processes them one by one (fetches video links and sends to user).
+There are three Lambda Functions:
+- **fetchTweetsToDownload** runs every 5 minutes and checks for new mentions. It publishes these new mentions as a new notification on an SNS topic
+- **sendDownloadLink** is triggered by new SNS messages. It processes the tweets in the message body, retrieves download links and sends to the user.
 
 ### Notes
 - Retrieved video links are cached in Redis
-- Task Queue implemented with Redis
 - Why 10 minute intervals? So as to not hit Twitter's rate limits and minimize AWS Lambda usage time, while being near-realtime. An alternate implementation would be to use Twitter's Streaming API. However, this wouldn't work with AWS Lambda (max runtime of a function is 300 seconds), so I'd need to maintain a dedicated server for that.
 
 ## Todo
-- Refactor `sendDownloadLinks` so it dispatches a separate Lambda function for each task, in order to prevent the function tiiming out. On the other hand, we'd need to be careful, as this can result in hitting Twitter's rate limits. (Priority: :arrow_up:)
 - Set TTLs for all cached values to ensure more important data is retained longer. (Priority: :arrow_up:)
 - Add a filter to avoid processing tweets we already replied to (am I overengineering this?) (Priority: :arrow_down:)
+- Support processing tweets where the referenced tweet is a retweet of a tweet containing a video (I'm not sure, but I think this currently works)
+- Support DMs (DMing the bot with the tweet link) (Priority: :arrow_down:)
+- I've discovered there are different types of video shared via Twitter. For non-native video, the `extended_entities` object is not present, so the bot fails. We need to look into supporting other types of video

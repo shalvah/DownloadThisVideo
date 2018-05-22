@@ -39,9 +39,18 @@ module.exports = (cache) => {
         }
 
         return t.get(`statuses/show`, {id: referencing_tweet})
-            .then(r => r.data)
+            .then(r => {
+                if (r.data.errors) {
+                    throw `Error in tweet response: ${JSON.stringify(r.data)}`;
+                }
+                return r.data;
+            })
             .then(tweet => {
-                return tweet.extended_entities.media[0].video_info.variants[0].url;
+                try {
+                    return tweet.extended_entities.media[0].video_info.variants[0].url;
+                } catch (e) {
+                    throw `Malformed tweet: ${JSON.stringify(tweet)}`;
+                }
             })
     };
 

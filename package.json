@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/shalvah/NotYourNass.git"
   },
+  "engines": {
+    "node": "8.10.0"
+  },
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -17,6 +20,7 @@
   },
   "homepage": "https://github.com/shalvah/NotYourNass#readme",
   "dependencies": {
+    "aws-sdk": "^2.244.1",
     "bluebird": "^3.5.1",
     "redis": "^2.8.0",
     "twit": "^2.2.9"

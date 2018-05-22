@@ -3,9 +3,11 @@
 const not = (fn) => (...args) => !fn(...args);
 const and = (...fns) => (...args) => fns.reduce((y, fn) => fn(...args) && y, true);
 
-const finish = (cb) => {
+const finish = (cb, cache) => {
+    cache.quit();
     return {
         success(body) {
+            console.log(`Response: ${body}`);
             const response = {
                 statusCode: 200,
                 body

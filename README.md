@@ -12,6 +12,7 @@ Easily download videos/GIFs off Twitter. Mention the bot (@this_vid) in a reply 
 There are three Lambda Functions:
 - **fetchTweetsToDownload** runs every 5 minutes and checks for new mentions. It publishes these new mentions as a new notification on an SNS topic
 - **sendDownloadLink** is triggered by new SNS messages. It processes the tweets in the message body, retrieves download links and sends to the user.
+- **retryFailedTasks** runs every 10 minutes and re-publishes failed tasks as a new SNS message
 
 ### Notes
 - Retrieved video links are cached in Redis

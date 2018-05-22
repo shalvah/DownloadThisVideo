@@ -15,16 +15,13 @@ module.exports.fetchTweetsToDownload = async (event, context, callback) => {
         return;
     }
 
-    console.log(process.env.topicARN)
+    console.log(process.env.TOPIC_ARN);
     const sns = new AWS.SNS();
-    await Promise.all(mentions.map(tweet => {
-        const params = {
-            Message: JSON.stringify(tweet),
-            TopicArn: process.env.topicARN
-        };
-        return sns.publish(params).promise();
-    })).then(console.log);
-
+    const params = {
+        Message: JSON.stringify(mentions),
+        TopicArn: process.env.TOPIC_ARN
+    };
+    await sns.publish(params).promise();
     await cache.setAsync('lastTweetRetrieved', mentions[0].id);
 
     finish(callback, cache).success(`Published ${mentions.length} tweets`);
@@ -35,22 +32,45 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
 
-    event.Records.forEach(async (record) => {
-        let tweet = JSON.parse(record.Sns.Message);
+    const tweets = event.Records.reduce((acc, record) => acc.concat(JSON.parse(record.Sns.Message)), []);
+
+    await Promise.all(tweets.map(async (tweet) => {
         if (twitter.shouldDownloadVid(tweet)) {
             try {
                 let link = await twitter.getVideoLink(tweet);
                 if (link) {
-                    await Promise.all([
+                    return await Promise.all([
                         cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
                         twitter.replyWithLink(tweet, link),
                     ]);
                 }
             } catch (e) {
-                await cache.lpushAsync('Fail', [JSON.stringify(tweet)]);
+                console.log(`Failed processing tweet: ${JSON.stringify(tweet)} - Error: ${e}`);
+                return await cache.lpushAsync('Fail', [JSON.stringify(tweet)]);
             }
         }
-    });
+    }));
 
-    finish(callback, cache).success(`Processed ${event.Records.length} tasks`);
+    finish(callback, cache).success(`Processed ${tweets.length} tasks`);
+};
+
+module.exports.retryFailedTasks = async (event, context, callback) => {
+    const cache = await makeCache();
+
+    const tweets = await cache.lrangeAsync('Fail', 0, -1);
+
+    if (!tweets) {
+        finish(callback, cache).success(`No tasks for retrying`);
+        return;
+    }
+    const sns = new AWS.SNS();
+    const params = {
+        Message: JSON.stringify(tweets.map(JSON.parse)),
+        TopicArn: process.env.TOPIC_ARN
+    };
+    await sns.publish(params).promise();
+    await cache.delAsync('Fail');
+
+    finish(callback, cache).success(`Sent ${tweets.length} tasks for retrying`);
+
 };

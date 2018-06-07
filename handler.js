@@ -45,6 +45,10 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
                     ]);
                 }
             } catch (e) {
+                if (e.name === 'CustomPublisherError') {
+                    twitter.reply(tweet, e.message);
+                    return 1;
+                }
                 console.log(`Failed processing tweet: ${JSON.stringify(tweet)} - Error: ${e}`);
                 return await cache.lpushAsync('Fail', [JSON.stringify(tweet)]);
             }

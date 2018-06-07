@@ -26,9 +26,17 @@ const randomSuccessResponse = () => {
     return responses[Math.floor(Math.random() * responses.length)]
 };
 
+class CustomPublisherError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'CustomPublisherError';
+    }
+}
+
 module.exports = {
     not,
     and,
     finish,
-    randomSuccessResponse
+    randomSuccessResponse,
+    CustomPublisherError
 };

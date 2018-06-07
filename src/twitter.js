@@ -3,6 +3,7 @@
 const not = require('./utils').not;
 const and = require('./utils').and;
 const message = require('./utils').randomSuccessResponse;
+const CustomPublisherError = require('./utils').CustomPublisherError;
 const Twit = require('twit');
 
 const t = new Twit({
@@ -42,30 +43,74 @@ module.exports = (cache) => {
             return cachedLink;
         }
 
-        return t.get(`statuses/show`, {
+        let response = await t.get(`statuses/show`, {
             id: referencing_tweet,
             tweet_mode: 'extended',
-            // cards_platform: 'Web-12',
-            // include_cards: 1,
-        }).then(r => {
-            if (r.data.errors) {
-                throw `Error in tweet response: ${JSON.stringify(r.data)}`;
-            }
-            return r.data;
-        })
-            .then(tweet => {
-                try {
-                    return tweet.extended_entities.media[0].video_info.variants[0].url;
-                } catch (e) {
-                    throw `Malformed tweet: ${JSON.stringify(tweet)}`;
+            cards_platform: 'Web-12',
+            include_cards: 1,
+        });
+        if (response.data.errors) {
+            throw `Error in tweet response: ${JSON.stringify(response.data.errors)}`;
+        }
+
+        let tweet = response.data;
+
+        // this function will recursively check for a link
+        function lookForRecognizableLink(additonalMediaInfo) {
+            const keys = Object.keys(additonalMediaInfo);
+            for (let i = 0; i < keys.length; i++) {
+                let k = keys[i];
+                if (typeof additonalMediaInfo[k] === 'string'
+                    && additonalMediaInfo[k].startsWith('http')) {
+                    return additonalMediaInfo[k];
+                } else if (typeof additonalMediaInfo[k] === 'object') {
+                    let nestedLink = lookForRecognizableLink(additonalMediaInfo[k])
+                    if (nestedLink) {
+                        return nestedLink;
+                    }
                 }
-            })
+            }
+            return null;
+        }
+
+        try {
+            console.log(JSON.stringify(tweet))
+            // the direct path
+            return tweet.extended_entities.media[0].video_info
+                .variants.find(variant => variant.content_type === 'video/mp4')
+                .url;
+        } catch (e) {
+            if (tweet.extended_entities
+                && tweet.extended_entities.media.length
+                && tweet.extended_entities.media[0].additional_media_info
+                && !tweet.extended_entities.media[0].additional_media_info.embeddable) {
+                // a custom publisher? not much we can do about it
+                // see https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/extended-entities-object.html
+                // We'll still try our best, though
+                let additonalMediaInfo = tweet.extended_entities.media[0].additional_media_info;
+                let link = lookForRecognizableLink(additonalMediaInfo);
+                if (!link) {
+                    throw new CustomPublisherError("Looks like this video's from a custom publisher who's restricted it, so I can't access it :(");
+                }
+                throw new CustomPublisherError("Looks like this video's from a custom publisher who's restricted it. Here's the best I could come up with: " + link);
+
+            } else if (tweet.entities && tweet.entities.media && tweet.entities.media.length) {
+                // sometimes, the tweet is a share of another tweet containing media
+                // example: https://twitter.com/GalacticoHD/status/889023844991807489
+                let expandedUrl = tweet.entities.media[0].expanded_url.split('/');
+                let tweetId = expandedUrl[expandedUrl.length - 3];
+                if (tweetId !== referencing_tweet) {
+                    return await getVideoLink({referencing_tweet: tweetId});
+                }
+            }
+            throw `Malformed tweet: ${JSON.stringify(tweet)}`;
+        }
     };
 
-    const replyWithLink = (tweet, link) => {
+    const reply = (tweet, content) => {
         let options = {
             in_reply_to_status_id: tweet.id,
-            status: `@${tweet.author} ${message()} ${link}`
+            status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
             .then(r => {
@@ -73,6 +118,11 @@ module.exports = (cache) => {
                     throw `Error in statuses/update response: ${JSON.stringify(r.data.errors)}`;
                 }
             });
+    };
+
+    const replyWithLink = (tweet, link) => {
+        let content = `${message()} ${link}`;
+        return reply(tweet, content);
     };
 
     const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
@@ -106,6 +156,7 @@ module.exports = (cache) => {
     return {
         getMentions,
         getVideoLink,
+        reply,
         replyWithLink,
         shouldDownloadVid,
     };

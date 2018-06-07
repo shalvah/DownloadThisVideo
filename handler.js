@@ -15,7 +15,6 @@ module.exports.fetchTweetsToDownload = async (event, context, callback) => {
         return;
     }
 
-    console.log(process.env.TOPIC_ARN);
     const sns = new AWS.SNS();
     const params = {
         Message: JSON.stringify(mentions),
@@ -24,6 +23,7 @@ module.exports.fetchTweetsToDownload = async (event, context, callback) => {
     await sns.publish(params).promise();
     await cache.setAsync('lastTweetRetrieved', mentions[0].id);
 
+   // log('run', { published: { length: mentions.length, data: mentions } });
     finish(callback, cache).success(`Published ${mentions.length} tweets`);
     return;
 };
@@ -35,7 +35,7 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
     const tweets = event.Records.reduce((acc, record) => acc.concat(JSON.parse(record.Sns.Message)), []);
 
     await Promise.all(tweets.map(async (tweet) => {
-        if (twitter.shouldDownloadVid(tweet)) {
+        if (await twitter.shouldDownloadVid(tweet)) {
             try {
                 let link = await twitter.getVideoLink(tweet);
                 if (link) {
@@ -48,6 +48,9 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
                 console.log(`Failed processing tweet: ${JSON.stringify(tweet)} - Error: ${e}`);
                 return await cache.lpushAsync('Fail', [JSON.stringify(tweet)]);
             }
+        } else {
+            console.log(`Nothing to download: ${JSON.stringify(tweet)}`);
+            return 1;
         }
     }));
 
@@ -56,10 +59,9 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
 
 module.exports.retryFailedTasks = async (event, context, callback) => {
     const cache = await makeCache();
-
     const tweets = await cache.lrangeAsync('Fail', 0, -1);
 
-    if (!tweets) {
+    if (!tweets.length) {
         finish(callback, cache).success(`No tasks for retrying`);
         return;
     }
@@ -72,5 +74,5 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     await cache.delAsync('Fail');
 
     finish(callback, cache).success(`Sent ${tweets.length} tasks for retrying`);
-
 };
+

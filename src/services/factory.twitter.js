@@ -46,7 +46,7 @@ module.exports = (cache) => {
             }));
     };
 
-    const getTweets = (tweets) => {
+    const getActualTweetsReferenced = (tweets) => {
         return t.post(`statuses/lookup`, {
             id: pluck(tweets, 'referencing_tweet'),
             tweet_mode: 'extended',
@@ -114,7 +114,7 @@ module.exports = (cache) => {
         reply,
         replyWithLink,
         shouldDownloadVid,
-        getTweets,
+        getActualTweetsReferenced,
         fetchTweet
     };
 

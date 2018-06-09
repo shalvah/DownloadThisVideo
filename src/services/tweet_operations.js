@@ -65,11 +65,11 @@ const extractVideoLink = async (tweetObject, { cache, twitter }) => {
     }
 };
 
-const handleTweetProcessingError = (e, tweet, { cache, twitter }) => {
+const handleTweetProcessingError = (e, tweet, { cache, twitter, tweetObject }) => {
     if (e.name === 'ExternalPublisherError') {
         return twitter.reply(tweet, e.message).then(() => e.status);
     }
-    console.log(`Failed processing tweet: ${JSON.stringify(tweet)} - Error: ${JSON.stringify(e)}`);
+    console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${JSON.stringify(e)}`);
     return cache.lpushAsync('Fail', [JSON.stringify(tweet)])
         .then(() => e.name === 'NoVideoInTweet' ? null : FAIL);
 };

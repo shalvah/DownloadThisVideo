@@ -26,11 +26,12 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
     const twitter = makeTwitter(cache);
 
     const tweets = sns.getPayloadFromSnsEvent(event);
-    const tweetsData = await twitter.getTweets(tweets);
-    let results = await Promise.all(tweetsData.map((tweet) => {
-        return ops.extractVideoLink(tweet, {cache, twitter})
+    const tweetObjects = await twitter.getActualTweetsReferenced(tweets);
+    let results = await Promise.all(tweetObjects.map((tweetObject) => {
+        let tweet = tweets.find(t => t.referencing_tweet === tweetObject.id_str);
+        return ops.extractVideoLink(tweetObject, {cache, twitter})
             .then(link => ops.handleTweetProcessingSuccess(tweet, link, {cache, twitter}))
-            .catch(e => ops.handleTweetProcessingError(e, tweet, {cache, twitter}));
+            .catch(e => ops.handleTweetProcessingError(e, tweet, {cache, twitter, tweetObject}));
     }));
 
     results = results.filter(r => r !== null);

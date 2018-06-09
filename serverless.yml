@@ -12,6 +12,11 @@ provider:
         - sns:Publish
       Resource:
         - ${self:custom.snsArn}
+    - Effect: Allow
+      Action:
+        - cloudwatch:PutMetricData
+      Resource:
+        - "*"
 
   environment:
     TWITTER_CONSUMER_KEY:
@@ -21,7 +26,7 @@ provider:
     REDIS_HOSTNAME:
     REDIS_PORT:
     REDIS_PASSWORD:
-    TWITTER_SCREEN_NAME:
+    TWITTER_SCREEN_NAME: this_vid
     TOPIC_ARN: ${self:custom.snsArn}
 functions:
   fetchTweetsToDownload:
@@ -30,12 +35,10 @@ functions:
       - schedule: rate(5 minutes)
   retryFailedTasks:
     handler: handler.retryFailedTasks
-    events:
-      - schedule: rate(10 minutes)
   sendDownloadLink:
     handler: handler.sendDownloadLink
     events:
       - sns: newMention
 
 custom:
-  snsArn: "arn:aws:sns:#{AWS::AccountRegion}:#{AWS::AccountId}:newMention"
+  snsArn: "arn:aws:sns:us-east-1:<AccountId>:newMention"

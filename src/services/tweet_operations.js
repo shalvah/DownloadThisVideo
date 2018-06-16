@@ -40,7 +40,7 @@ const extractVideoLink = async (tweetObject, { cache, twitter }) => {
             .variants.find(variant => variant.content_type === 'video/mp4')
             .url;
     } catch (e) {
-        let additionalMediaInfo = get(tweetObject, 'extended_entities.media.0..additional_media_info');
+        let additionalMediaInfo = get(tweetObject, 'extended_entities.media.0.additional_media_info');
         if (additionalMediaInfo && !additionalMediaInfo.embeddable) {
             // a custom publisher? not much we can do about it
             // see https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/extended-entities-object.html

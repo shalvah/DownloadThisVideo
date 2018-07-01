@@ -11,14 +11,20 @@ module.exports.fetchTweetsToDownload = async (event, context, callback) => {
     const cache = await makeCache();
     const twitter = makeTwitter(cache);
 
-    const mentions = await twitter.getMentions();
-    if (!mentions.length) {
-        finish(callback, cache).success('No new mentions');
-        return;
+    let lastTweetRetrieved = null;
+    let count = 0;
+    let mentions = await twitter.getMentions();
+    while (mentions.length) {
+        await sns.sendToSns(mentions);
+        lastTweetRetrieved = mentions[0].id;
+        count += mentions.length;
+        mentions = await twitter.getMentions(lastTweetRetrieved);
     }
-    await sns.sendToSns(mentions);
-    await cache.setAsync('lastTweetRetrieved', mentions[0].id);
-    finish(callback, cache).success(`Published ${mentions.length} tweets`);
+
+    if (lastTweetRetrieved) {
+        await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
+    }
+    finish(callback, cache).success(`Published ${count} tweets`);
 };
 
 module.exports.sendDownloadLink = async (event, context, callback) => {

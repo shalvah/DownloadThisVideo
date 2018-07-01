@@ -23,8 +23,8 @@ const t = new Twit({
 
 module.exports = (cache) => {
 
-    const getMentions = async () => {
-        let lastTweetId = await cache.getAsync('lastTweetRetrieved');
+    const getMentions = async (lastTweetRetrieved) => {
+        let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
         let options = {count: 100};
         if (lastTweetId) {
             options.since_id = lastTweetId;

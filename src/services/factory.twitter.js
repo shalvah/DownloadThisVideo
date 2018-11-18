@@ -66,14 +66,19 @@ module.exports = (cache) => {
         return t.post('statuses/update', options)
             .then(r => {
                 if (r.data.errors) {
-                    throw new TwitterErrorResponse('statuses/update', r.data.errors);
+                    // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
+                    cache.setAsync('no-reply', 1, 10 * 60);
                 }
                 return r;
             });
     };
 
-    const replyWithLink = (tweet, link) => {
-        let content = `${randomSuccessResponse()} ${link}`;
+    const replyWithRedirect = (tweet) => {
+        if (cache.getAsync('no-reply') == 1) {
+            return Promise.resolve();
+        }
+
+        let content = randomSuccessResponse(tweet.author);
         return reply(tweet, content);
     };
 
@@ -112,7 +117,7 @@ module.exports = (cache) => {
     return {
         getMentions,
         reply,
-        replyWithLink,
+        replyWithRedirect,
         shouldDownloadVid,
         getActualTweetsReferenced,
         fetchTweet

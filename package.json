@@ -24,5 +24,8 @@
     "bluebird": "^3.5.1",
     "redis": "^2.8.0",
     "twit": "^2.2.9"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^2.0.1"
   }
 }

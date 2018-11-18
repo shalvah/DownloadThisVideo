@@ -7,3 +7,5 @@ jspm_packages
 
 .idea/
 package-lock.json
+
+.env

@@ -38,14 +38,13 @@ const finish = (cb, cache) => {
     }
 };
 
-const randomSuccessResponse = () => {
+const randomSuccessResponse = (username) => {
     let responses = [
-        "Here you go!",
-        "Here's the link you requested:",
-        "Enjoy!",
-        "Yay, video!"
+        "Yay, video! Check for your download link at {link}.\nNote: I won't show ths message in the future, so just check that link whenever you make a new download request.🤗🤗",
+        "Your video is ready! Your download link is at {link}.\nNote: I won't show ths message in the future, so check that link whenever you make a new download request.🤗",
     ];
-    return responses[Math.floor(Math.random() * responses.length)]
+    let response = responses[Math.floor(Math.random() * responses.length)];
+    return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);
 };
 
 class ExternalPublisherError extends Error {

@@ -74,10 +74,17 @@ const handleTweetProcessingError = (e, tweet, { cache, twitter, tweetObject }) =
         .then(() => e.name === 'NoVideoInTweet' ? null : FAIL);
 };
 
+const updateUserDownloads = (tweet, link) => {
+    const key = `user-${tweet.author}`;
+    return cache.lpushAsync(key, JSON.stringify({ videoUrl: link, tweet: tweet.referencing_tweet }))
+        .then(cache.expireAsync(key, 24 * 60 * 60));
+};
+
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     return Promise.all([
         cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
-        twitter.replyWithLink(tweet, link),
+        updateUserDownloads(tweet, link),
+        twitter.replyWithRedirect(tweet).catch(),
     ]).then(() => SUCCESS);
 };
 

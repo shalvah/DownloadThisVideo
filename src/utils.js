@@ -2,6 +2,7 @@
 
 const hbs = require('handlebars');
 const path = require('path');
+const fs = require('fs');
 
 const not = (fn) => (...args) => !fn(...args);
 
@@ -41,9 +42,9 @@ const finish = (cb, cache) => {
 
         render(view, data) {
             view = path.resolve(__dirname, '..', `view.${view}.hbs`);
-            console.log(view)
             let body = fs.readFileSync(view);
-            body = hbs.compile(body);
+            let template = hbs.compile(body);
+            body = template(data);
 
             const response = {
                 statusCode: 200,
@@ -56,8 +57,8 @@ const finish = (cb, cache) => {
 
 const randomSuccessResponse = (username) => {
     let responses = [
-        "Yay, video! Check for your download link at {link}.\nNote: I won't show ths message in the future, so just check that link whenever you make a new download request.🤗🤗",
-        "Your video is ready! Your download link is at {link}.\nNote: I won't show ths message in the future, so check that link whenever you make a new download request.🤗",
+        "Yay, video! Check for your download link at {link}.\n\nNote: I won't show ths message in the future, so just check that link whenever you make a new download request.🤗🤗",
+        "Your video is ready! Your download link is at {link}.\n\nNote: I won't show ths message in the future, so check that link whenever you make a new download request.🤗",
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);

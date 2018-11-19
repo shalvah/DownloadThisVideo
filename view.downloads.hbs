@@ -1,7 +1,7 @@
 <h2>{{ username }}'s downloads</h2>
 
 {{#each downloads }}
-    <div>Video link: {{ this.videoUrl }}</div>
-    <div>Tweet: https://twitter.com/statuses/{{ this.tweet }}</div>
+    <div><a href="{{ this.videoUrl }}" target="_blank">Video link</a></div>
+    <div><a href="https://twitter.com/statuses/{{ this.tweet }}" target="_blank">View tweet</a></div>
     <br>
 {{/each}}

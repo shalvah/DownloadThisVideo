@@ -1,5 +1,8 @@
 'use strict';
 
+const hbs = require('handlebars');
+const path = require('path');
+
 const not = (fn) => (...args) => !fn(...args);
 
 const and = (...fns) => (...args) => fns.reduce((y, fn) => fn(...args) && y, true);
@@ -34,6 +37,19 @@ const finish = (cb, cache) => {
         fail(body) {
             console.log(`Fail response: ${body}`);
             cb(body);
+        },
+
+        render(view, data) {
+            view = path.resolve(__dirname, '..', `view.${view}.hbs`);
+            console.log(view)
+            let body = fs.readFileSync(view);
+            body = hbs.compile(body);
+
+            const response = {
+                statusCode: 200,
+                body
+            };
+            cb(null, response);
         }
     }
 };

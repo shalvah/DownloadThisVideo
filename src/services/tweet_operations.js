@@ -69,22 +69,22 @@ const handleTweetProcessingError = (e, tweet, { cache, twitter, tweetObject }) =
     if (e.name === 'ExternalPublisherError') {
         return twitter.reply(tweet, e.message).then(() => e.status);
     }
-    console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${JSON.stringify(e)}`);
+    console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${e.valueOf()}`);
     return cache.lpushAsync('Fail', [JSON.stringify(tweet)])
         .then(() => e.name === 'NoVideoInTweet' ? null : FAIL);
 };
 
-const updateUserDownloads = (tweet, link) => {
+const updateUserDownloads = (tweet, link, cache) => {
     const key = `user-${tweet.author}`;
-    return cache.lpushAsync(key, JSON.stringify({ videoUrl: link, tweet: tweet.referencing_tweet }))
-        .then(cache.expireAsync(key, 24 * 60 * 60));
+    return cache.lpushAsync(key, [JSON.stringify({ videoUrl: link, tweet: tweet.referencing_tweet })])
+        .then(() => cache.expireAsync(key, 24 * 60 * 60));
 };
 
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     return Promise.all([
-        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
-        updateUserDownloads(tweet, link),
-        twitter.replyWithRedirect(tweet).catch(),
+        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link, 'EX', 7 * 24 * 60 * 60),
+        updateUserDownloads(tweet, link, cache),
+        twitter.replyWithRedirect(tweet),
     ]).then(() => SUCCESS);
 };
 

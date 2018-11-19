@@ -58,24 +58,25 @@ module.exports = (cache) => {
         });
     };
 
-    const reply = (tweet, content) => {
+    const reply = async (tweet, content) => {
         let options = {
             in_reply_to_status_id: tweet.id,
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .then(r => {
+            .then((r) => {
                 if (r.data.errors) {
                     // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
-                    cache.setAsync('no-reply', 1, 10 * 60);
+                    return cache.setAsync('no-reply', 'EX', 1, 10 * 60).then(() => r);
                 }
                 return r;
             });
     };
 
-    const replyWithRedirect = (tweet) => {
-        if (cache.getAsync('no-reply') == 1) {
-            return Promise.resolve();
+    const replyWithRedirect = async (tweet) => {
+        let noReply = await cache.getAsync('no-reply');
+        if (noReply == 1) {
+            return true;
         }
 
         let content = randomSuccessResponse(tweet.author);

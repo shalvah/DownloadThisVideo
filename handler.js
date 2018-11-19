@@ -57,3 +57,12 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     await cache.delAsync('Fail');
     finish(callback, cache).success(`Sent ${tweets.length} tasks for retrying`);
 };
+
+module.exports.getDownloads = async (event, context, callback) => {
+    const cache = await makeCache();
+    const username = event.pathParameters.username;
+    let downloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+    downloads = downloads.map(JSON.parse);
+
+    finish(callback, cache).render('downloads', { username, downloads });
+};

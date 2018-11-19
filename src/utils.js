@@ -48,6 +48,7 @@ const finish = (cb, cache) => {
 
             const response = {
                 statusCode: 200,
+                headers: {"content-type": "text/html"},
                 body
             };
             cb(null, response);

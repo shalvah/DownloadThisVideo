@@ -58,8 +58,8 @@ const finish = (cb, cache) => {
 
 const randomSuccessResponse = (username) => {
     let responses = [
-        "Yay, video! Check for your download link at {link}.\n\nNote: I won't show ths message in the future, so just check that link whenever you make a new download request.🤗🤗",
-        "Your video is ready! Your download link is at {link}.\n\nNote: I won't show ths message in the future, so check that link whenever you make a new download request.🤗",
+        "Yay, video! Check for your download link at {link}.\n\nNote: I may not always show this message in the future, so just check that link whenever you make a new download request.🤗🤗",
+        "Your video is ready! Your download link: {link}.\n\nNote: I may not always show this message in the future, so check that link whenever you make a new download request.🤗",
     ];
     let response = responses[Math.floor(Math.random() * responses.length)];
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);

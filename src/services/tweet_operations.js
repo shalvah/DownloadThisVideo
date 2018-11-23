@@ -1,6 +1,6 @@
 'use strict';
 
-const { get, SUCCESS, FAIL, UNCERTAIN } = require('../utils');
+const { get, findItemWithGreatest, SUCCESS, FAIL, UNCERTAIN } = require('../utils');
 const { ExternalPublisherError, NoVideoInTweet } = require('../errors');
 
 const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
@@ -36,9 +36,9 @@ const extractVideoLink = async (tweetObject, { cache, twitter }) => {
 
     try {
         // the direct path
-        return tweetObject.extended_entities.media[0].video_info
-            .variants.find(variant => variant.content_type === 'video/mp4')
-            .url;
+        const variants =  tweetObject.extended_entities.media[0].video_info
+            .variants.filter(variant => variant.content_type === 'video/mp4');
+        return findItemWithGreatest('bitrate', variants).url;
     } catch (e) {
         let additionalMediaInfo = get(tweetObject, 'extended_entities.media.0.additional_media_info');
         if (additionalMediaInfo && !additionalMediaInfo.embeddable) {

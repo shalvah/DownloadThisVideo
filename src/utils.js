@@ -10,6 +10,11 @@ const and = (...fns) => (...args) => fns.reduce((y, fn) => fn(...args) && y, tru
 
 const pluck = (values, key) => values.map(v => v[key]);
 
+const findItemWithGreatest = (key, arrayOfObjects) => {
+    const max = Math.max(...pluck(arrayOfObjects, key));
+    return arrayOfObjects.find(item => item[key] == max);
+};
+
 const get = (object, path) => {
     let lookup = Object.assign({}, object);
     let keys = path.split('.');
@@ -128,6 +133,7 @@ module.exports = {
     not,
     and,
     pluck,
+    findItemWithGreatest,
     get,
     finish,
     randomSuccessResponse,

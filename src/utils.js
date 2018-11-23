@@ -65,6 +65,30 @@ const randomSuccessResponse = (username) => {
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);
 };
 
+const getRelativeTime = (time) => {
+
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+
+    const elapsed = new Date - new Date(time);
+
+    const pluralize = (value, unit) => parseInt(value) < 1 ? unit : (unit + 's');
+
+    if (elapsed < msPerMinute) {
+        return 'Just now';
+    } else if (elapsed < msPerHour) {
+        let minutes = Math.round(elapsed/msPerMinute);
+        return minutes + ` ${pluralize(minutes, 'minute')} ago`;
+    } else if (elapsed < msPerDay ) {
+        let hours = Math.round(elapsed/msPerHour);
+        return hours + ` ${pluralize(hours, 'hour')} ago`;
+    } else {
+        let days = Math.round(elapsed/msPerDay);
+        return days + ` ${pluralize(days, 'day')} ago`;
+    }
+};
+
 class ExternalPublisherError extends Error {
     constructor(message) {
         super(message);
@@ -94,6 +118,7 @@ module.exports = {
     get,
     finish,
     randomSuccessResponse,
+    getRelativeTime,
     ExternalPublisherError,
     TwitterErrorResponse,
     SUCCESS,

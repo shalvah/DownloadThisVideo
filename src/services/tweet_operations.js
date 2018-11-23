@@ -76,7 +76,12 @@ const handleTweetProcessingError = (e, tweet, { cache, twitter, tweetObject }) =
 
 const updateUserDownloads = (tweet, link, cache) => {
     const key = `user-${tweet.author}`;
-    return cache.lpushAsync(key, [JSON.stringify({ videoUrl: link, tweet: tweet.referencing_tweet })])
+    const entry = {
+        videoUrl: link,
+        tweet: tweet.referencing_tweet,
+        time: tweet.time,
+    };
+    return cache.lpushAsync(key, [JSON.stringify(entry)])
         .then(() => cache.expireAsync(key, 24 * 60 * 60));
 };
 

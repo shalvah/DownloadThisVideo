@@ -49,7 +49,7 @@ const finish = (cb, cache = null) => {
                 // no need to bother compiling Handlebars template
                 const response = {
                     statusCode: 200,
-                    headers: {"content-type": "text/html"},
+                    headers: {"content-type": "text/html; charset=utf-8"},
                     body
                 };
                 cb(null, response);

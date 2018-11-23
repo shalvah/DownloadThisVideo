@@ -10,7 +10,7 @@ provider:
   timeout: 30
   package:
     include:
-    - views/downloads.hbs
+    - views/*
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -65,3 +65,9 @@ functions:
           parameters:
             paths:
               username: true
+  getHomePage:
+    handler: handler.getHomePage
+    events:
+    - http:
+        path: /
+        method: get

@@ -23,8 +23,9 @@ const get = (object, path) => {
     return lookup;
 };
 
-const finish = (cb, cache) => {
-    cache.quit();
+const finish = (cb, cache = null) => {
+    if (cache) cache.quit();
+
     return {
         success(body) {
             console.log(`Response: ${body}`);
@@ -40,9 +41,21 @@ const finish = (cb, cache) => {
             cb(body);
         },
 
-        render(view, data) {
+        render(view, data = null) {
             view = path.resolve(__dirname, '..', 'views', `${view}.hbs`);
             let body = fs.readFileSync(view, "utf8");
+
+            if (!data) {
+                // no need to bother compiling Handlebars template
+                const response = {
+                    statusCode: 200,
+                    headers: {"content-type": "text/html"},
+                    body
+                };
+                cb(null, response);
+                return;
+            }
+
             let template = hbs.compile(body);
             body = template(data);
 

@@ -41,7 +41,7 @@ const finish = (cb, cache) => {
         },
 
         render(view, data) {
-            view = path.resolve(__dirname, '..', `view.${view}.hbs`);
+            view = path.resolve(__dirname, '..', 'views', `${view}.hbs`);
             let body = fs.readFileSync(view, "utf8");
             let template = hbs.compile(body);
             body = template(data);

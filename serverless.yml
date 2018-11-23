@@ -10,7 +10,7 @@ provider:
   timeout: 30
   package:
     include:
-    - view.downloads.hbs
+    - views/downloads.hbs
   iamRoleStatements:
     - Effect: Allow
       Action:

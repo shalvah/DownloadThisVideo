@@ -82,7 +82,7 @@ const updateUserDownloads = (tweet, link, cache) => {
         time: tweet.time,
     };
     return cache.lpushAsync(key, [JSON.stringify(entry)])
-        .then(() => cache.expireAsync(key, 24 * 60 * 60));
+        .then(() => cache.expireAsync(key, 2 * 24 * 60 * 60));
 };
 
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {

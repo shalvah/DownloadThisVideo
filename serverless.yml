@@ -11,6 +11,12 @@ provider:
   package:
     include:
     - views/*
+    exclude:
+    - README.md
+    - .gitignore
+    - .env
+    - .env.example
+    - .idea/*
   iamRoleStatements:
     - Effect: Allow
       Action:

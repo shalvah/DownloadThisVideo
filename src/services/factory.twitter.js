@@ -25,7 +25,7 @@ module.exports = (cache) => {
 
     const getMentions = async (lastTweetRetrieved) => {
         let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
-        let options = {count: 100};
+        let options = {count: 200};
         if (lastTweetId) {
             options.since_id = lastTweetId;
         }
@@ -68,7 +68,7 @@ module.exports = (cache) => {
             .then((r) => {
                 if (r.data.errors) {
                     // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
-                    return cache.setAsync('no-reply', 'EX', 1, 10 * 60).then(() => r);
+                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
                 }
                 return r;
             });

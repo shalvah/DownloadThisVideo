@@ -1,6 +1,6 @@
 'use strict';
 
-const finish = require('./src/utils').finish;
+const { finish, getRelativeTime } = require('./src/utils');
 const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
@@ -56,4 +56,27 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
     await sns.sendToSns(tweets.map(JSON.parse));
     await cache.delAsync('Fail');
     finish(callback, cache).success(`Sent ${tweets.length} tasks for retrying`);
+};
+
+module.exports.getDownloads = async (event, context, callback) => {
+    const username = event.pathParameters.username;
+    if (!username) {
+        finish(callback).render('home');
+        return;
+    }
+
+    const cache = await makeCache();
+    let downloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+    const prepareDownloadforFrontend = (d) => {
+        return JSON.parse(d, function convertTimeToRelative(key, value) {
+            return key === 'time' ? getRelativeTime(value) : value;
+        })
+    };
+    downloads = downloads.map(prepareDownloadforFrontend);
+
+    finish(callback, cache).render('downloads', { username, downloads });
+};
+
+module.exports.getHomePage = (event, context, callback) => {
+    finish(callback).render('home');
 };

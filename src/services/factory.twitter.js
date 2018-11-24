@@ -25,7 +25,7 @@ module.exports = (cache) => {
 
     const getMentions = async (lastTweetRetrieved) => {
         let lastTweetId = lastTweetRetrieved || await cache.getAsync('lastTweetRetrieved');
-        let options = {count: 100};
+        let options = {count: 200};
         if (lastTweetId) {
             options.since_id = lastTweetId;
         }
@@ -40,6 +40,7 @@ module.exports = (cache) => {
             .then(tweets => tweets.map(tweetObject => {
                 return {
                     id: tweetObject.id_str,
+                    time: tweetObject.created_at,
                     referencing_tweet: tweetObject.in_reply_to_status_id_str,
                     author: tweetObject.user.screen_name
                 }
@@ -58,22 +59,28 @@ module.exports = (cache) => {
         });
     };
 
-    const reply = (tweet, content) => {
+    const reply = async (tweet, content) => {
         let options = {
             in_reply_to_status_id: tweet.id,
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .then(r => {
+            .then((r) => {
                 if (r.data.errors) {
-                    throw new TwitterErrorResponse('statuses/update', r.data.errors);
+                    // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
+                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
                 }
                 return r;
             });
     };
 
-    const replyWithLink = (tweet, link) => {
-        let content = `${randomSuccessResponse()} ${link}`;
+    const replyWithRedirect = async (tweet) => {
+        let noReply = await cache.getAsync('no-reply');
+        if (noReply == 1) {
+            return true;
+        }
+
+        let content = randomSuccessResponse(tweet.author);
         return reply(tweet, content);
     };
 
@@ -112,7 +119,7 @@ module.exports = (cache) => {
     return {
         getMentions,
         reply,
-        replyWithLink,
+        replyWithRedirect,
         shouldDownloadVid,
         getActualTweetsReferenced,
         fetchTweet

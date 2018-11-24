@@ -1,4 +1,6 @@
 service: DownloadThisVideo
+plugins:
+- serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -6,12 +8,26 @@ provider:
   stage: beta
   memorySize: 128
   timeout: 30
+  package:
+    include:
+    - views/*
+    exclude:
+    - README.md
+    - .gitignore
+    - .env
+    - .env.example
+    - .idea/*
+    - this-vid.png
   iamRoleStatements:
     - Effect: Allow
       Action:
         - sns:Publish
       Resource:
-        - ${self:custom.snsArn}
+        - "Fn::Join":
+          - ':'
+          - - "arn:aws:sns:us-east-1"
+            - Ref: AWS::AccountId
+            - "newMention"
     - Effect: Allow
       Action:
         - cloudwatch:PutMetricData
@@ -19,26 +35,46 @@ provider:
         - "*"
 
   environment:
-    TWITTER_CONSUMER_KEY:
-    TWITTER_CONSUMER_SECRET:
-    TWITTER_ACCESS_TOKEN:
-    TWITTER_ACCESS_TOKEN_SECRET:
-    REDIS_HOSTNAME:
-    REDIS_PORT:
-    REDIS_PASSWORD:
-    TWITTER_SCREEN_NAME: this_vid
-    TOPIC_ARN: ${self:custom.snsArn}
+    TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}
+    TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
+    TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
+    TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
+    REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
+    REDIS_PORT: ${env:REDIS_PORT}
+    REDIS_PASSWORD: ${env:REDIS_PASSWORD}
+    TWITTER_SCREEN_NAME: ${env:TWITTER_SCREEN_NAME}
+    EXTERNAL_URL: ${env:EXTERNAL_URL}
+    TOPIC_ARN:
+      "Fn::Join":
+      - ':'
+      -
+        - "arn:aws:sns:us-east-1"
+        - Ref: AWS::AccountId
+        - "newMention"
 functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload
     events:
-      - schedule: rate(5 minutes)
+    - schedule: rate(4 minutes)
   retryFailedTasks:
     handler: handler.retryFailedTasks
   sendDownloadLink:
     handler: handler.sendDownloadLink
     events:
-      - sns: newMention
-
-custom:
-  snsArn: "arn:aws:sns:us-east-1:<AccountId>:newMention"
+    - sns: newMention
+  getDownloads:
+    handler: handler.getDownloads
+    events:
+    - http:
+        path: /{username}
+        method: get
+        request:
+          parameters:
+            paths:
+              username: true
+  getHomePage:
+    handler: handler.getHomePage
+    events:
+    - http:
+        path: /
+        method: get

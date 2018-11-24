@@ -1,6 +1,6 @@
 'use strict';
 
-const { get, SUCCESS, FAIL, UNCERTAIN } = require('../utils');
+const { get, findItemWithGreatest, SUCCESS, FAIL, UNCERTAIN } = require('../utils');
 const { ExternalPublisherError, NoVideoInTweet } = require('../errors');
 
 const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
@@ -36,9 +36,9 @@ const extractVideoLink = async (tweetObject, { cache, twitter }) => {
 
     try {
         // the direct path
-        return tweetObject.extended_entities.media[0].video_info
-            .variants.find(variant => variant.content_type === 'video/mp4')
-            .url;
+        const variants =  tweetObject.extended_entities.media[0].video_info
+            .variants.filter(variant => variant.content_type === 'video/mp4');
+        return findItemWithGreatest('bitrate', variants).url;
     } catch (e) {
         let additionalMediaInfo = get(tweetObject, 'extended_entities.media.0.additional_media_info');
         if (additionalMediaInfo && !additionalMediaInfo.embeddable) {
@@ -69,15 +69,27 @@ const handleTweetProcessingError = (e, tweet, { cache, twitter, tweetObject }) =
     if (e.name === 'ExternalPublisherError') {
         return twitter.reply(tweet, e.message).then(() => e.status);
     }
-    console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${JSON.stringify(e)}`);
+    console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${e.valueOf()}`);
     return cache.lpushAsync('Fail', [JSON.stringify(tweet)])
         .then(() => e.name === 'NoVideoInTweet' ? null : FAIL);
 };
 
+const updateUserDownloads = (tweet, link, cache) => {
+    const key = `user-${tweet.author}`;
+    const entry = {
+        videoUrl: link,
+        tweet: tweet.referencing_tweet,
+        time: tweet.time,
+    };
+    return cache.lpushAsync(key, [JSON.stringify(entry)])
+        .then(() => cache.expireAsync(key, 2 * 24 * 60 * 60));
+};
+
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     return Promise.all([
-        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link),
-        twitter.replyWithLink(tweet, link),
+        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link, 'EX', 7 * 24 * 60 * 60),
+        updateUserDownloads(tweet, link, cache),
+        twitter.replyWithRedirect(tweet),
     ]).then(() => SUCCESS);
 };
 

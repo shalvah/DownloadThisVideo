@@ -34,3 +34,9 @@ Renders the homepage 😁. See http://download-this.video.
 This re-publishes failed tasks (stored in Redis) as a new SNS message. For now, it can only be triggered manually.
 
 # Development
+- CLone the repo
+- Run `npm install`.
+
+That's pretty much it. Deployments can only be done by the maintainer, so depending on where you're contributing, you might have to develop "in the dark".
+
+I should probably add a couple unit tests here and there. 🤔

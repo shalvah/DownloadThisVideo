@@ -8,16 +8,6 @@ provider:
   stage: beta
   memorySize: 128
   timeout: 30
-  package:
-    include:
-    - views/*
-    exclude:
-    - README.md
-    - .gitignore
-    - .env
-    - .env.example
-    - .idea/*
-    - this-vid.png
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -51,6 +41,19 @@ provider:
         - "arn:aws:sns:us-east-1"
         - Ref: AWS::AccountId
         - "newMention"
+
+package:
+  include:
+  - views/**
+  exclude:
+  - README.md
+  - .gitignore
+  - .env
+  - .env.example
+  - .idea/**
+  - .git/**
+  - this-vid.png
+
 functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload

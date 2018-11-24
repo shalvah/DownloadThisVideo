@@ -17,6 +17,7 @@ provider:
     - .env
     - .env.example
     - .idea/*
+    - this-vid.png
   iamRoleStatements:
     - Effect: Allow
       Action:

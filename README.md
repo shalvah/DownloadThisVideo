@@ -25,7 +25,7 @@ This is triggered by new notifications on the SNS topic. It:
 - attempts to reply to the user with a link to the user's download page (see section below). "Attempts" because  Twitter enforces tweet limits (2400 per day, counted in 15-minute periods). If the API limits have been reached, the bot will "cool down" (not send any replies) for 10 minutes.
 
 #### getDownloads
-This is triggered by a HTTP request to the <AWS API Gateway URL>/<Twitter-handle> (for instance, http://download-this.video/theshalvah). It renders a page showing a list of the user's recent downloads.
+This is triggered by a HTTP request to the <AWS API Gateway URL>/<Twitter-handle> (for instance, http://download-this.video/jack). It renders a page showing a list of the user's recent downloads.
 
 #### getHomePage
 Renders the homepage 😁. See http://download-this.video.

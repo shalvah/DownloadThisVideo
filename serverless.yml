@@ -8,6 +8,7 @@ provider:
   stage: beta
   memorySize: 128
   timeout: 30
+  logRetentionInDays: 30
   iamRoleStatements:
     - Effect: Allow
       Action:

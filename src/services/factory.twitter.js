@@ -62,10 +62,10 @@ module.exports = (cache) => {
         };
         return t.post('statuses/update', options)
             .catch(e => {
-                console.log(e);
                 if ((e.valueOf() + '').includes('User is over daily status update limit')) {
                     // not sending any more replies for 10 minutes
                     // to avoid Twitter blocking our API access
+                    console.log('Rate limit reached, backing off for 10 minutes');
                     return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
                 }
 

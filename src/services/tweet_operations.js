@@ -69,11 +69,6 @@ const handleTweetProcessingError = async (e, tweet, { cache, twitter, tweetObjec
     if (e.name === 'ExternalPublisherError') {
         return twitter.reply(tweet, e.message).then(() => e.status);
     }
-    if ((e.valueOf() + '').includes('User is over daily status update limit')) {
-        // need to investigate why the other place isn't working -- or remove that entirely
-        await cache.setAsync('no-reply', 1, 'EX', 10 * 60);
-        return SUCCESS;
-    }
     console.log(`Failed processing tweet: ${JSON.stringify(tweetObject)} - Error: ${e.valueOf()}`);
     return cache.lpushAsync('Fail', [JSON.stringify(tweet)])
         .then(() => e.name === 'NoVideoInTweet' ? null : FAIL);

@@ -22,7 +22,6 @@ class NoVideoInTweet extends Error {
         super("Couldn't find any video in this tweet");
         this.name = 'NoVideoInTweet';
         this.tweetObject = tweetObject;
-        console.log(`Malformed tweet: ${JSON.stringify(tweetObject)}`);
     }
 }
 

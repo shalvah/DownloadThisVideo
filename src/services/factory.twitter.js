@@ -30,11 +30,9 @@ module.exports = (cache) => {
             options.since_id = lastTweetId;
         }
         return t.get('statuses/mentions_timeline', options)
-            .then(r => {
-                if (r.data.errors) {
-                    throw `Error in statuses/mentions_timeline response: ${JSON.stringify(r.data.errors)}`;
-                }
-                return r.data;
+            .then(r => r.data)
+            .catch(e => {
+                throw new TwitterErrorResponse('statuses/mentions_timeline', e);
             })
             .then(tweets => tweets.filter(and(isTweetAReply, not(isTweetAReplyToMe))))
             .then(tweets => tweets.map(tweetObject => {
@@ -51,12 +49,10 @@ module.exports = (cache) => {
         return t.post(`statuses/lookup`, {
             id: pluck(tweets, 'referencing_tweet'),
             tweet_mode: 'extended',
-        }).then(r => {
-            if (r.data.errors) {
-                throw new TwitterErrorResponse('statuses/lookup', r.data.errors);
-            }
-            return r.data;
-        });
+        }).then(r => r.data)
+            .catch(e => {
+                throw new TwitterErrorResponse('statuses/lookup', e);
+            });
     };
 
     const reply = async (tweet, content) => {
@@ -65,13 +61,16 @@ module.exports = (cache) => {
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .then((r) => {
-                if (r.data.errors) {
-                    // not sending any more replies for 10 minutes to avoid Twitter blocking our API access
-                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60).then(() => r);
+            .catch(e => {
+                console.log(e);
+                if ((e.valueOf() + '').includes('User is over daily status update limit')) {
+                    // not sending any more replies for 10 minutes
+                    // to avoid Twitter blocking our API access
+                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
                 }
-                return r;
-            });
+
+                throw new TwitterErrorResponse('statuses/update', e);
+            })
     };
 
     const replyWithRedirect = async (tweet) => {
@@ -108,12 +107,10 @@ module.exports = (cache) => {
         return t.get(`statuses/show`, {
             id: tweetId,
             tweet_mode: 'extended',
-        }).then(r => {
-            if (r.data.errors) {
-                throw new TwitterErrorResponse('statuses/show', r.data.errors);
-            }
-            return r.data;
-        });
+        }).then(r => r.data)
+            .catch(e => {
+                throw new TwitterErrorResponse('statuses/show', e);
+            });
     };
 
     return {

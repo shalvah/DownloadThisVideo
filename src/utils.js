@@ -107,22 +107,6 @@ const getRelativeTime = (time) => {
     }
 };
 
-class ExternalPublisherError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = 'ExternalPublisherError';
-    }
-}
-
-class TwitterErrorResponse extends Error {
-    constructor(endpoint, errors) {
-        super('Error from Twitter API call');
-        this.name = 'TwitterErrorResponse';
-        this.errors = errors;
-        this.endpoint = endpoint;
-    }
-}
-
 const SUCCESS = 'Success';
 
 const FAIL = 'Fail';
@@ -138,8 +122,6 @@ module.exports = {
     finish,
     randomSuccessResponse,
     getRelativeTime,
-    ExternalPublisherError,
-    TwitterErrorResponse,
     SUCCESS,
     FAIL,
     UNCERTAIN

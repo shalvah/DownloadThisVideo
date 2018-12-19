@@ -34,7 +34,7 @@ Renders the homepage 😁. See http://download-this.video.
 This re-publishes failed tasks (stored in Redis) as a new SNS message. For now, it can only be triggered manually.
 
 # Supporters
-These folks help to keep this running. If you've benefited from this work and would kike to keep it running, consider [supporting me on Patreon](https://www.patreon.com/shalvah).
+These folks help to keep this running. If you've benefited from this work and would like to help keep it running, consider [supporting me on Patreon](https://www.patreon.com/shalvah).
 
 - Sharee
 - Uzo Olisemeka

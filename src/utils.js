@@ -91,7 +91,7 @@ const getRelativeTime = (time) => {
 
     const elapsed = new Date - new Date(time);
 
-    const pluralize = (value, unit) => parseInt(value) < 1 ? unit : (unit + 's');
+    const pluralize = (value, unit) => parseInt(value) <= 1 ? unit : (unit + 's');
 
     if (elapsed < msPerMinute) {
         return 'Just now';

@@ -33,10 +33,8 @@ Renders the homepage 😁. See http://download-this.video.
 #### retryFailedTasks
 This re-publishes failed tasks (stored in Redis) as a new SNS message. For now, it can only be triggered manually.
 
-# Development
-- CLone the repo
-- Run `npm install`.
+# Supporters
+These folks help to keep this running. If you've benefited from this work and would kike to keep it running, consider [supporting me on Patreon](https://www.patreon.com/shalvah).
 
-That's pretty much it. Deployments can only be done by the maintainer, so depending on where you're contributing, you might have to develop "in the dark".
-
-I should probably add a couple unit tests here and there. 🤔
+- Sharee
+- Uzo Olisemeka

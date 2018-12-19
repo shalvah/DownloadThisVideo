@@ -26,19 +26,25 @@
 
 <body>
 <div class="content">
-<h2>{{ username }}'s downloads</h2>
-    <p><small>Downloads you've requested in the past 48 hours show up here.</small></p>
-{{#each downloads }}
-    <small>{{ this.time }}</small>
-    <div><a href="{{ this.videoUrl }}" target="_blank">Video link</a> &bullet; <a href="https://twitter.com/statuses/{{ this.tweet }}" target="_blank">View tweet</a></div>
-    <br>
-{{/each}}
+    <h2>{{ username }}'s downloads</h2>
+    <p>
+        <small>Downloads you've requested in the past 48 hours show up here.</small>
+    </p>
+    {{#each downloads }}
+        <small>{{ this.time }}</small>
+        <div><a href="{{ this.videoUrl }}" target="_blank">Video link</a> &bullet; <a
+                href="https://twitter.com/statuses/{{ this.tweet }}" target="_blank">View tweet</a></div>
+        <br>
+    {{/each}}
 
 </div>
 
 <footer style="margin-bottom: 0; padding-bottom: 0">
-    <div>Psst...if you like @this_vid, you can help keep it running by <a href="https://www.patreon.com/shalvah">supporting me on Patreon.</a></div>
-<br>
-    <div><a href="https://github.com/shalvah/DownloadThisVideo">View the source code</a></div>
+    <div>Psst...if you like @this_vid, you can help keep it running by <a href="https://www.patreon.com/shalvah">supporting
+        me on Patreon.</a></div>
+    <br>
+    <div>Got questions? <a href="./faq">See our FAQ..</a></div>
+    <br>
+    <div>If you're a developer, you might be interested in <a href="https://github.com/shalvah/DownloadThisVideo">the source code</a></div>
 </footer>
 </body>

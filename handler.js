@@ -60,21 +60,28 @@ module.exports.retryFailedTasks = async (event, context, callback) => {
 
 module.exports.getDownloads = async (event, context, callback) => {
     const username = event.pathParameters.username;
-    if (!username) {
-        finish(callback).render('home');
-        return;
+    switch (username) {
+        case null:
+        case undefined:
+        case '':
+            finish(callback).render('home');
+            return;
+        case 'faq':
+            const faqs = require('faqs');
+            finish(callback).render('faq', { faqs });
+            return;
+        default:
+            const cache = await makeCache();
+            let downloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+            const prepareDownloadforFrontend = (d) => {
+                return JSON.parse(d, function convertTimeToRelative(key, value) {
+                    return key === 'time' ? getRelativeTime(value) : value;
+                })
+            };
+            downloads = downloads.map(prepareDownloadforFrontend);
+
+            finish(callback, cache).render('downloads', {username, downloads});
     }
-
-    const cache = await makeCache();
-    let downloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
-    const prepareDownloadforFrontend = (d) => {
-        return JSON.parse(d, function convertTimeToRelative(key, value) {
-            return key === 'time' ? getRelativeTime(value) : value;
-        })
-    };
-    downloads = downloads.map(prepareDownloadforFrontend);
-
-    finish(callback, cache).render('downloads', { username, downloads });
 };
 
 module.exports.getHomePage = (event, context, callback) => {

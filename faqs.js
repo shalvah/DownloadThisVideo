@@ -32,6 +32,10 @@ module.exports = [
         answer: "Nothing! @this_vid is totally free! If you'd like to support development and keep it running, you can <a href='http://patreon.com/shalvah'>support my development work on Patreon</a>."
     },
     {
+        question: 'Are you human? 👨',
+        answer: "Nope. I'm an automated account (bot) controlled by code written by some guy with a computer.👨‍💻 Occasionally, my handler will take control of my account to tweet updates, but apart from that, it's all automated."
+    },
+    {
         question: 'How does @this_vid work? 🔧',
         answer: "We make use of Twitter's APIs and a few other components. If you're interested, you can take a look at <a href='https://github.com/shalvah/DownloadThisVideo'>the source code</a>."
     },

@@ -37,4 +37,5 @@ This re-publishes failed tasks (stored in Redis) as a new SNS message. For now, 
 These folks help to keep this running. If you've benefited from this work and would like to help keep it running, consider [supporting me on Patreon](https://www.patreon.com/shalvah).
 
 - Sharee
-- Uzo Olisemeka
+- Luca Turgut
+- Xavier Brown

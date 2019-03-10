@@ -67,7 +67,7 @@ module.exports.getDownloads = async (event, context, callback) => {
             finish(callback).render('home');
             return;
         case 'faq':
-            const faqs = require('faqs');
+            const faqs = require('./faqs');
             finish(callback).render('faq', { faqs });
             return;
         default:

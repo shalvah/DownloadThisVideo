@@ -113,11 +113,11 @@ custom:
         period: 60
         treatMissingData: notBreaching
       functionDuration:
-        # alert if function takes more than 2 seconds 90% of the time over an hour
+        # alert if function takes more than 2 seconds too many times over an hour
         threshold: 2000
-        period: 3600
+        period: 60
         datapointsToAlarm: 10
-        evaluationPeriods: 9
+        evaluationPeriods: 30
         treatMissingData: notBreaching
     topics:
       alarm:

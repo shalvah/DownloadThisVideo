@@ -22,11 +22,12 @@
   "dependencies": {
     "aws-sdk": "^2.244.1",
     "bluebird": "^3.5.1",
-    "handlebars": "^4.0.12",
+    "handlebars": "^4.1.0",
     "redis": "^2.8.0",
     "twit": "^2.2.9"
   },
   "devDependencies": {
-    "serverless-dotenv-plugin": "^2.0.1"
+    "serverless-dotenv-plugin": "^2.0.1",
+    "serverless-plugin-aws-alerts": "^1.2.4"
   }
 }

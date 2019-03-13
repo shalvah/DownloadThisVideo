@@ -1,6 +1,7 @@
 service: DownloadThisVideo
 plugins:
 - serverless-dotenv-plugin
+- serverless-plugin-aws-alerts
 
 provider:
   name: aws
@@ -59,13 +60,24 @@ functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload
     events:
-    - schedule: rate(4 minutes)
+    - schedule: rate(2 minutes)
+    alarms:
+    - functionErrors
+    - name: functionDuration
+      threshold: 5000
+
   retryFailedTasks:
     handler: handler.retryFailedTasks
+
   sendDownloadLink:
     handler: handler.sendDownloadLink
     events:
     - sns: newMention
+    alarms:
+    - functionErrors
+    - name: functionDuration
+      threshold: 5000
+
   getDownloads:
     handler: handler.getDownloads
     events:
@@ -76,9 +88,40 @@ functions:
           parameters:
             paths:
               username: true
+    alarms:
+    - functionErrors
+    - name: functionDuration
+      threshold: 2000
+
   getHomePage:
     handler: handler.getHomePage
     events:
     - http:
         path: /
         method: get
+    alarms:
+    - functionErrors
+    - name: functionDuration
+      threshold: 1000
+
+custom:
+  alerts:
+    definitions:
+      functionErrors:
+        # alert if function throws an error
+        threshold: 1
+        period: 60
+        treatMissingData: notBreaching
+      functionDuration:
+        # alert if function takes more than 2 seconds 90% of the time over an hour
+        threshold: 2000
+        period: 3600
+        datapointsToAlarm: 10
+        evaluationPeriods: 9
+        treatMissingData: notBreaching
+    topics:
+      alarm:
+        topic: ${self:service}-dev-alerts-alarm
+        notifications:
+        - protocol: email
+          endpoint: shalvah.adebayo+awsalerts@gmail.com

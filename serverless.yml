@@ -60,7 +60,7 @@ functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload
     events:
-    - schedule: rate(2 minutes)
+    - schedule: rate(1 minute)
     alarms:
     - functionErrors
     - name: functionDuration
@@ -113,7 +113,7 @@ custom:
         period: 60
         treatMissingData: notBreaching
       functionDuration:
-        # alert if function takes more than 2 seconds too many times over an hour
+        # alert if function takes more than 2 seconds too many times
         threshold: 2000
         period: 60
         datapointsToAlarm: 10

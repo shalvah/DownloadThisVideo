@@ -1,7 +1,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
-    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico"
+          type="image/x-icon" />
 
     <!-- Primary Meta Tags -->
     <title>this_vid: Download videos and GIFs off Twitter</title>
@@ -67,6 +68,18 @@
         </small>
     </div>
 
+    <br>
+    <b>Looking for your downloads?👀</b>
+    <form onsubmit="event.preventDefault(); goToDownloads();">
+        <input name="username" placeholder="Your Twitter username">
+        <button type="submit">Take me there</button>
+    </form>
+
+    <script>
+        function goToDownloads() {
+            window.location = document.querySelector('input[name=username]').value;
+        }
+    </script>
 </div>
 
 

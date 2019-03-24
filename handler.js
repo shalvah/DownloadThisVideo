@@ -1,6 +1,6 @@
 'use strict';
 
-const { finish, getRelativeTime } = require('./src/utils');
+const { finish, getRelativeTime, getSponsoredLink } = require('./src/utils');
 const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
@@ -64,11 +64,11 @@ module.exports.getDownloads = async (event, context, callback) => {
         case null:
         case undefined:
         case '':
-            finish(callback).render('home');
+            finish(callback).render('home', { link: getSponsoredLink() });
             return;
         case 'faq':
             const faqs = require('./faqs');
-            finish(callback).render('faq', { faqs });
+            finish(callback).render('faq', { faqs, link: getSponsoredLink() });
             return;
         default:
             const cache = await makeCache();
@@ -80,7 +80,7 @@ module.exports.getDownloads = async (event, context, callback) => {
             };
             downloads = downloads.map(prepareDownloadforFrontend);
 
-            finish(callback, cache).render('downloads', {username, downloads});
+            finish(callback, cache).render('downloads', {username, downloads, link: getSponsoredLink()});
     }
 };
 

@@ -1,7 +1,7 @@
 module.exports = [
     {
         question: 'How do I use this? ❓',
-        answer: "First, find a tweet with a video you'd like to download. Then mention @this_vid in a reply to the tweet. Visit http://download-this.video/your-Twitter-handle in a few minutes and you should see the link to download your video. For instance, if your twitter handle is @jack, your downloads will be at download-this.video/jack.😄"
+        answer: "First, find a tweet with a video you'd like to download. Then mention @this_vid in a reply to the tweet. Visit http://thisvid.space/your-Twitter-handle in a few minutes and you should see the link to download your video. For instance, if your twitter handle is @jack, your downloads will be at thisvid.space/jack.😄"
     },
     {
         question: 'I quoted @this_vid on a tweet but I didn\'t get a response. 😐',
@@ -9,7 +9,7 @@ module.exports = [
     },
     {
         question: 'I mentioned @this_vid in a reply but I didn\'t get a response. 😕',
-        answer: "We're sorry! Twitter only allows us to post 300 tweets every 3 hours, so we can't reply to every request. But your download will still be processed! You can check for it at download-this.video/your-Twitter-handle. For instance, if your twitter handle is @jack, your downloads will be at download-this.video/jack. To make things easier, you can bookmark the link in your browser.😅"
+        answer: "We're sorry! Twitter only allows us to post 300 tweets every 3 hours, so we can't reply to every request. But your download will still be processed! You can check for it at thisvid.space/your-Twitter-handle. For instance, if your twitter handle is @jack, your downloads will be at thisvid.space/jack. To make things easier, you can bookmark the link in your browser.😅"
     },
     {
         question: 'I mentioned @this_vid in a reply and I checked my downloads page, but there was nothing there! 😭',

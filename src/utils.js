@@ -10,6 +10,10 @@ const and = (...fns) => (...args) => fns.reduce((y, fn) => fn(...args) && y, tru
 
 const pluck = (values, key) => values.map(v => v[key]);
 
+Array.prototype.random = function () {
+    return this[Math.floor(Math.random() * this.length)];
+};
+
 const findItemWithGreatest = (key, arrayOfObjects) => {
     const max = Math.max(...pluck(arrayOfObjects, key));
     return arrayOfObjects.find(item => item[key] == max);
@@ -79,7 +83,7 @@ const randomSuccessResponse = (username) => {
         `Yay, video! Check for your download link at {link}. I may not always reply to you, so just bookmark this link and check it whenever you make a new download request. Got questions? See ${process.env.EXTERNAL_URL}/faq.🤗`,
         `Your video is ready! Your download link: {link}. I may not always reply to you, so check that link whenever you make a new download request. Check out ${process.env.EXTERNAL_URL}/faq if you've got any questions.🤗`,
     ];
-    let response = responses[Math.floor(Math.random() * responses.length)];
+    let response = responses.random();
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);
 };
 
@@ -107,6 +111,25 @@ const getRelativeTime = (time) => {
     }
 };
 
+const getSponsoredLink = () => {
+    const links = [
+        {
+            text: "Your idea. Your brand. Your space. Get a .SPACE domain now for 3 years at $15 with the code GETMYSPACE.",
+            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner1"
+        },
+        {
+            text: ".SPACE domains: creative domains for creative souls. Use the code GETMYSPACE to get a 3-year domain for $15.",
+            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner2"
+        },
+        {
+            text: "Innovate. Disrupt.Repeat. Get a 3-year .SPACE domain for $15 with code GETMYSPACE.",
+            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner3"
+        },
+    ];
+
+    return links.random();
+};
+
 const SUCCESS = 'Success';
 
 const FAIL = 'Fail';
@@ -122,6 +145,7 @@ module.exports = {
     finish,
     randomSuccessResponse,
     getRelativeTime,
+    getSponsoredLink,
     SUCCESS,
     FAIL,
     UNCERTAIN

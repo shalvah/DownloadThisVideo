@@ -3,7 +3,7 @@ node_js:
 - "8.10"
 
 env:
-- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=download-this.video
+- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space
 
 cache:
   directories:

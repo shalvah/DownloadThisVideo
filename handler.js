@@ -85,5 +85,5 @@ module.exports.getDownloads = async (event, context, callback) => {
 };
 
 module.exports.getHomePage = (event, context, callback) => {
-    finish(callback).render('home');
+    finish(callback).render('home',  { link: getSponsoredLink() });
 };

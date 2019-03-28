@@ -10,7 +10,7 @@ class ExternalPublisherError extends Error {
 
 class TwitterErrorResponse extends Error {
     constructor(endpoint, errors) {
-        super('Error from Twitter API call: ' + JSON.strinigify(errors));
+        super('Error from Twitter API call: ' + JSON.stringify(errors));
         this.name = 'TwitterErrorResponse';
         this.errors = errors;
         this.endpoint = endpoint;

@@ -60,7 +60,7 @@ functions:
   fetchTweetsToDownload:
     handler: handler.fetchTweetsToDownload
     events:
-    - schedule: rate(120 minute)
+    - schedule: rate(1 minute)
     alarms:
     - functionErrors
     - name: functionDuration

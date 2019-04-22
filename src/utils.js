@@ -80,8 +80,11 @@ const finish = (cb, cache = null) => {
 
 const randomSuccessResponse = (username) => {
     let responses = [
-        `Yay, video! Check for your download link at {link}. I may not always reply to you, so just bookmark this link and check it whenever you make a new download request. Got questions? See ${process.env.EXTERNAL_URL}/faq.🤗`,
-        `Your video is ready! Your download link: {link}. I may not always reply to you, so check that link whenever you make a new download request. Check out ${process.env.EXTERNAL_URL}/faq if you've got any questions.🤗`,
+        `Yay, video! Your download link's at {link}. You can bookmark this link and check it whenever you make a new download request. Got questions? See ${process.env.EXTERNAL_URL}/faq. 🤗`,
+        `Hey, hey, here's your download link: {link}. I may not always reply to you, so check that link whenever you make a new download request. Check out ${process.env.EXTERNAL_URL}/faq if you've got any questions.🤗`,
+        `All done, boss! Your download link: {link}. Psst...your new downloads will always be there, even when I don't reply. See ${process.env.EXTERNAL_URL}/faq if you've got any questions.👍`,
+        `You're all set! Your new video's at {link}. PS: you can bookmark that link and check it in future whenever you mention me. See you around.🤗`,
+        `I've got you, boss. Your download's at {link}. #ForTheDownload ✊`,
     ];
     let response = responses.random();
     return response.replace('{link}', `http://${process.env.EXTERNAL_URL}/${username}`);

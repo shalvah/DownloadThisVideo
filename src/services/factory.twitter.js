@@ -7,7 +7,6 @@ const {
     randomSuccessResponse,
 } = require('../utils');
 const { TwitterErrorResponse } = require('../errors');
-const cloudwatch = require('./cloudwatch');
 const {
     haveIRepliedToTweetAlready,
     isTweetAReplyToMe,
@@ -31,7 +30,6 @@ module.exports = (cache) => {
             options.since_id = lastTweetId;
         }
         const endpoint = 'statuses/mentions_timeline';
-        cloudwatch.trackApiCalls(endpoint);
         return t.get(endpoint, options)
             .catch(e => {
                 throw new TwitterErrorResponse(endpoint, e);

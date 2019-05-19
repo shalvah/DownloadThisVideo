@@ -6,12 +6,13 @@ const {
     pluck,
     randomSuccessResponse,
 } = require('../utils');
-const { TwitterErrorResponse } = require('../errors');
 const {
     haveIRepliedToTweetAlready,
     isTweetAReplyToMe,
     isTweetAReply
 } = require('./tweet_operations');
+const { handleTwitterErrors, errors } = require('twitter-error-handler');
+const aargh = require('aargh');
 const Twit = require('twit');
 
 const t = new Twit({
@@ -31,9 +32,7 @@ module.exports = (cache) => {
         }
         const endpoint = 'statuses/mentions_timeline';
         return t.get(endpoint, options)
-            .catch(e => {
-                throw new TwitterErrorResponse(endpoint, e);
-            })
+            .catch(e => handleTwitterErrors(endpoint, e))
             .then(r => r.data)
             .then(tweets => tweets.filter(and(isTweetAReply, not(isTweetAReplyToMe))))
             .then(tweets => tweets.map(tweetObject => {
@@ -51,9 +50,7 @@ module.exports = (cache) => {
             id: pluck(tweets, 'referencing_tweet'),
             tweet_mode: 'extended',
         }).then(r => r.data)
-            .catch(e => {
-                throw new TwitterErrorResponse('statuses/lookup', e);
-            });
+            .catch(e => handleTwitterErrors('statuses/lookup', e));
     };
 
     const reply = async (tweet, content) => {
@@ -62,15 +59,17 @@ module.exports = (cache) => {
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
+            .catch(e => handleTwitterErrors('statuses/update', e))
             .catch(e => {
-                if ((e.valueOf() + '').includes('User is over daily status update limit')) {
-                    // not sending any more replies for 10 minutes
-                    // to avoid Twitter blocking our API access
-                    console.log('Rate limit reached, backing off for 10 minutes');
-                    return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
-                }
-
-                throw new TwitterErrorResponse('statuses/update', e);
+                return aargh(e)
+                    .type(errors.RateLimited, (e) => {
+                        // not sending any more replies for 10 minutes
+                        // to avoid Twitter blocking our API access
+                        console.log('Rate limit reached, backing off for 10 minutes');
+                        return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
+                    })
+                    .type(errors.BadRequest, console.log)
+                    .throw();
             })
     };
 
@@ -109,9 +108,7 @@ module.exports = (cache) => {
             id: tweetId,
             tweet_mode: 'extended',
         }).then(r => r.data)
-            .catch(e => {
-                throw new TwitterErrorResponse('statuses/show', e);
-            });
+            .catch(e => handleTwitterErrors('statuses/show', e));
     };
 
     return {

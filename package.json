@@ -26,7 +26,7 @@
     "handlebars": "^4.1.2",
     "redis": "^2.8.0",
     "twit": "^2.2.9",
-    "twitter-error-handler": "^1.1.0"
+    "twitter-error-handler": "^1.2.0"
   },
   "devDependencies": {
     "serverless-dotenv-plugin": "^2.0.1",

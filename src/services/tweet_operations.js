@@ -75,14 +75,16 @@ const handleTweetProcessingError = async (e, tweet, { cache, twitter, tweetObjec
 };
 
 const updateUserDownloads = (tweet, link, cache) => {
-    const key = `user-${tweet.author}`;
+    const today = (new Date).toISOString().substring(0, 10);
+    const username = tweet.author.toLowerCase();
+    const key = `user-${username}-${today}`;
     const entry = {
         videoUrl: link,
         tweet: tweet.referencing_tweet,
         time: tweet.time,
     };
     return cache.lpushAsync(key, [JSON.stringify(entry)])
-        .then(() => cache.expireAsync(key, 2 * 24 * 60 * 60));
+        .then(() => cache.expireAsync(key, 2 * 24 * 60 * 60)); // store user's downloads for last two days
 };
 
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
@@ -93,11 +95,32 @@ const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     ]).then(() => SUCCESS);
 };
 
+const getUserDownloads = async (username) => {
+    let oldSystemDownloads = [];
+    // I implemented the new system on 20 July,
+    // so we need to carry along old downloads for the next two days
+    if (Date.now() <= (new Date("2019-07-23")).getTime()) {
+        oldSystemDownloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+    }
+
+    const today = new Date;
+    username = username.toLowerCase();
+    const keys = [0, 1, 2].map((v, k) => {
+        const date = new Date(today.getTime() - (k * 24 * 60 * 60 * 1000));
+        const day = date.toISOString().substring(0, 10);
+        return `user-${username}-${day}`;
+    });
+    const newSystemDownloads = await Promise.all(keys.map(key => cache.lrangeAsync(key, 0, -1)));
+    console.log(`NEW_SYSTEM: ${newSystemDownloads}`);
+    return oldSystemDownloads.concat(...newSystemDownloads);
+};
+
 module.exports = {
     isTweetAReply,
     isTweetAReplyToMe,
     haveIRepliedToTweetAlready,
     extractVideoLink,
     handleTweetProcessingError,
-    handleTweetProcessingSuccess
+    handleTweetProcessingSuccess,
+    getUserDownloads,
 };

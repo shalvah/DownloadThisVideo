@@ -95,7 +95,7 @@ const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     ]).then(() => SUCCESS);
 };
 
-const getUserDownloads = async (username) => {
+const getUserDownloads = async (cache, username) => {
     let oldSystemDownloads = [];
     // I implemented the new system on 20 July,
     // so we need to carry along old downloads for the next two days

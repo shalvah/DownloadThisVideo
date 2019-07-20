@@ -72,12 +72,13 @@ module.exports.getDownloads = async (event, context, callback) => {
             return;
         default:
             const cache = await makeCache();
-            let downloads = await ops.getUserDownloads(username);
+            let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
                     return key === 'time' ? getRelativeTime(value) : value;
                 })
             };
+            console.log(`DOWNER: ${downloads}`)
             downloads = downloads.map(prepareDownloadforFrontend);
 
             finish(callback, cache).render('downloads', {username, downloads, link: getSponsoredLink()});

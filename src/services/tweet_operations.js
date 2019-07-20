@@ -96,22 +96,31 @@ const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
 };
 
 const getUserDownloads = async (cache, username) => {
-    let oldSystemDownloads = [];
+    let multi = cache.multi();
+
+    const today = new Date;
+    [0, 1, 2].map((v, k) => {
+        const date = new Date(today.getTime() - (k * 24 * 60 * 60 * 1000));
+        const day = date.toISOString().substring(0, 10);
+        const key = `user-${username.toLowerCase()}-${day}`;
+        multi.lrange(key, 0, -1);
+    });
+
     // I implemented the new system on 20 July,
     // so we need to carry along old downloads for the next two days
     if (Date.now() <= (new Date("2019-07-23")).getTime()) {
-        oldSystemDownloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+        multi.lrange(`user-${username}`, 0, -1);
     }
 
-    const today = new Date;
-    username = username.toLowerCase();
-    const keys = [0, 1, 2].map((v, k) => {
-        const date = new Date(today.getTime() - (k * 24 * 60 * 60 * 1000));
-        const day = date.toISOString().substring(0, 10);
-        return `user-${username}-${day}`;
+    // Dunno why multi/exec doesn't work as documented when using Bluebird.promisify
+    const downloads = await new Promise((resolve, reject) => {
+        multi.exec((err, results) => {
+            if (err) return reject(err);
+            return resolve(results);
+        });
     });
-    const newSystemDownloads = await Promise.all(keys.map(key => cache.lrangeAsync(key, 0, -1)));
-    return [].concat(...newSystemDownloads).concat(oldSystemDownloads); // Newer ones should come before older
+    // Flatten that array of arrays
+    return [].concat(...downloads);
 };
 
 module.exports = {

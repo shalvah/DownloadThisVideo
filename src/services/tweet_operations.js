@@ -111,8 +111,7 @@ const getUserDownloads = async (cache, username) => {
         return `user-${username}-${day}`;
     });
     const newSystemDownloads = await Promise.all(keys.map(key => cache.lrangeAsync(key, 0, -1)));
-    console.log(`NEW_SYSTEM: ${newSystemDownloads}`);
-    return oldSystemDownloads.concat(...newSystemDownloads);
+    return [].concat(...newSystemDownloads).concat(oldSystemDownloads); // Newer ones should come before older
 };
 
 module.exports = {

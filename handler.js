@@ -78,7 +78,6 @@ module.exports.getDownloads = async (event, context, callback) => {
                     return key === 'time' ? getRelativeTime(value) : value;
                 })
             };
-            console.log(`DOWNER: ${downloads}`)
             downloads = downloads.map(prepareDownloadforFrontend);
 
             finish(callback, cache).render('downloads', {username, downloads, link: getSponsoredLink()});

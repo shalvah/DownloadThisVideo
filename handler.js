@@ -72,7 +72,7 @@ module.exports.getDownloads = async (event, context, callback) => {
             return;
         default:
             const cache = await makeCache();
-            let downloads = await cache.lrangeAsync(`user-${username}`, 0, -1);
+            let downloads = await ops.getUserDownloads(username);
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
                     return key === 'time' ? getRelativeTime(value) : value;

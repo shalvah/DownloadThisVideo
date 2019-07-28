@@ -33,6 +33,11 @@ module.exports = (cache) => {
         const endpoint = 'statuses/mentions_timeline';
         return t.get(endpoint, options)
             .catch(e => handleTwitterErrors(endpoint, e))
+            .catch(e => {
+                return aargh(e)
+                    .type(errors.BadRequest)
+                    .throw();
+            })
             .then(r => r.data)
             .then(tweets => tweets.filter(and(isTweetAReply, not(isTweetAReplyToMe))))
             .then(tweets => tweets.map(tweetObject => {

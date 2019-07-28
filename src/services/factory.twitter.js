@@ -67,11 +67,11 @@ module.exports = (cache) => {
             .catch(e => handleTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
-                    .type(errors.RateLimited, (e) => {
+                    .type(errors.RateLimited, async (e) => {
                         // not sending any more replies for 10 minutes
                         // to avoid Twitter blocking our API access
                         console.log('Rate limit reached, backing off for 10 minutes');
-                        return cache.setAsync('no-reply', 1, 'EX', 10 * 60);
+                        await cache.setAsync('no-reply', 1, 'EX', 10 * 60);
                     })
                     .type(errors.BadRequest, console.log)
                     .throw();

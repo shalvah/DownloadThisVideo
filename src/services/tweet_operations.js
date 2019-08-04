@@ -98,19 +98,16 @@ const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
 const getUserDownloads = async (cache, username) => {
     let multi = cache.multi();
 
+    // We want to fetch downloads for the past 48 hrs.
+    // Rather than bother with the specifics of 48hrs,
+    // let's just fetch things in the last 3 days.
     const today = new Date;
     [0, 1, 2].map((v, k) => {
         const date = new Date(today.getTime() - (k * 24 * 60 * 60 * 1000));
-        const day = date.toISOString().substring(0, 10);
+        const day = date.toISOString().substring(0, 10); // Get the "date" part of the datetime
         const key = `user-${username.toLowerCase()}-${day}`;
         multi.lrange(key, 0, -1);
     });
-
-    // I implemented the new system on 20 July,
-    // so we need to carry along old downloads for the next two days
-    if (Date.now() <= (new Date("2019-07-23")).getTime()) {
-        multi.lrange(`user-${username}`, 0, -1);
-    }
 
     // Dunno why multi/exec doesn't work as documented when using Bluebird.promisify
     const downloads = await new Promise((resolve, reject) => {
@@ -119,7 +116,7 @@ const getUserDownloads = async (cache, username) => {
             return resolve(results);
         });
     });
-    // Flatten that array of arrays
+    // Flatten that array of arrays, baby.
     return [].concat(...downloads);
 };
 

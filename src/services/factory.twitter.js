@@ -11,7 +11,7 @@ const {
     isTweetAReplyToMe,
     isTweetAReply
 } = require('./tweet_operations');
-const { handleTwitterErrors, errors } = require('twitter-error-handler');
+const { wrapTwitterErrors, errors } = require('twitter-error-handler');
 const aargh = require('aargh');
 const Twit = require('twit');
 
@@ -32,12 +32,7 @@ module.exports = (cache) => {
         }
         const endpoint = 'statuses/mentions_timeline';
         return t.get(endpoint, options)
-            .catch(e => handleTwitterErrors(endpoint, e))
-            .catch(e => {
-                return aargh(e)
-                    .type(errors.BadRequest)
-                    .throw();
-            })
+            .catch(e => wrapTwitterErrors(endpoint, e))
             .then(r => r.data)
             .then(tweets => tweets.filter(and(isTweetAReply, not(isTweetAReplyToMe))))
             .then(tweets => tweets.map(tweetObject => {
@@ -47,15 +42,21 @@ module.exports = (cache) => {
                     referencing_tweet: tweetObject.in_reply_to_status_id_str,
                     author: tweetObject.user.screen_name
                 }
-            }));
+            }))
+            .catch(e => {
+                return aargh(e)
+                    .type(errors.BadRequest)
+                    .throw();
+            });
     };
 
     const getActualTweetsReferenced = (tweets) => {
         return t.post(`statuses/lookup`, {
             id: pluck(tweets, 'referencing_tweet'),
             tweet_mode: 'extended',
-        }).then(r => r.data)
-            .catch(e => handleTwitterErrors('statuses/lookup', e));
+        })
+            .then(r => r.data)
+            .catch(e => wrapTwitterErrors('statuses/lookup', e));
     };
 
     const reply = async (tweet, content) => {
@@ -64,7 +65,7 @@ module.exports = (cache) => {
             status: `@${tweet.author} ${content}`
         };
         return t.post('statuses/update', options)
-            .catch(e => handleTwitterErrors('statuses/update', e))
+            .catch(e => wrapTwitterErrors('statuses/update', e))
             .catch(e => {
                 return aargh(e)
                     .type(errors.RateLimited, async (e) => {
@@ -113,7 +114,7 @@ module.exports = (cache) => {
             id: tweetId,
             tweet_mode: 'extended',
         }).then(r => r.data)
-            .catch(e => handleTwitterErrors('statuses/show', e));
+            .catch(e => wrapTwitterErrors('statuses/show', e));
     };
 
     return {

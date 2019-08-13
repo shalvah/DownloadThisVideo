@@ -13,11 +13,12 @@ module.exports = {
         "ecmaVersion": 2018
     },
     "rules": {
-        "no-unused-vars": ["warn"],
         "no-await-in-loop": ["warn"],
+        "no-case-declarations": ["warn"],
         "no-extra-semi": ["warn"],
         "no-extra-boolean-cast": ["off"],
         "no-inner-declarations": ["off"],
         "no-mixed-spaces-and-tabs": ["off"],
+        "no-unused-vars": ["warn"],
     }
 };

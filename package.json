@@ -4,6 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
+    "lint": "eslint src handler.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "dotenv": "^8.0.0",
+    "eslint": "^6.1.0",
     "serverless-dotenv-plugin": "^2.1.1",
     "serverless-plugin-aws-alerts": "^1.2.4"
   }

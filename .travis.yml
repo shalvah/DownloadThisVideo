@@ -12,6 +12,7 @@ cache:
 install: npm i && npm i -g serverless
 
 stages:
+- name: lint
 - name: deploy
   if: branch = master
 
@@ -19,3 +20,6 @@ jobs:
   include:
   - stage: deploy
     script: sls deploy
+
+  - stage: lint
+    script: npm run lint

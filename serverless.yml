@@ -8,7 +8,7 @@ provider:
   runtime: nodejs8.10
   stage: beta
   memorySize: 128
-  timeout: 60
+  timeout: 100
   logRetentionInDays: 30
   iamRoleStatements:
     - Effect: Allow

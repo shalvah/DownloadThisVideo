@@ -74,6 +74,18 @@ const finish = (cb, cache = null) => {
                 body
             };
             cb(null, response);
+        },
+
+        sendFile(filename) {
+            const filePath = path.resolve(__dirname, '..', 'assets', filename);
+            let text = fs.readFileSync(filePath, "utf8");
+
+            const response = {
+                statusCode: 200,
+                headers: {"content-type": "text/html; charset=utf-8"},
+                text,
+            };
+            cb(null, response);
         }
     }
 };

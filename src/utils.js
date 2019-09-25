@@ -32,7 +32,7 @@ const get = (object, path) => {
     return lookup;
 };
 
-const finish = (cb, cache = null) => {
+const finish = (cb = () => {}, cache = null) => {
     if (cache) cache.quit();
 
     return {
@@ -43,11 +43,13 @@ const finish = (cb, cache = null) => {
                 body
             };
             cb(null, response);
+            return response;
         },
 
         fail(body) {
             console.log(`Fail response: ${body}`);
             cb(body);
+            return body;
         },
 
         render(view, data = null) {
@@ -62,7 +64,7 @@ const finish = (cb, cache = null) => {
                     body
                 };
                 cb(null, response);
-                return;
+                return response;
             }
 
             let template = hbs.compile(body);
@@ -74,6 +76,7 @@ const finish = (cb, cache = null) => {
                 body
             };
             cb(null, response);
+            return response;
         },
 
         sendFile(filename) {
@@ -86,6 +89,7 @@ const finish = (cb, cache = null) => {
                 text,
             };
             cb(null, response);
+            return response;
         }
     }
 };

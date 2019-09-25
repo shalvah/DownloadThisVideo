@@ -1,16 +1,14 @@
 'use strict';
 
+const cache = require('./src/services/cache');
+
 const { finish, getRelativeTime, getSponsoredLink } = require('./src/utils');
 const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
-const makeCache = require('./src/services/factory.cache');
-const makeTwitter = require('./src/services/factory.twitter');
+const twitter = require('./src/services/factory.twitter')(cache);
 
-module.exports.fetchTweetsToDownload = async (event, context, callback) => {
-    const cache = await makeCache();
-    const twitter = makeTwitter(cache);
-
+module.exports.fetchTweetsToDownload = async (event, context) => {
     let lastTweetRetrieved = null;
     let count = 0;
     let mentions = await twitter.getMentions();
@@ -24,13 +22,10 @@ module.exports.fetchTweetsToDownload = async (event, context, callback) => {
     if (lastTweetRetrieved) {
         await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
     }
-    finish(callback, cache).success(`Published ${count} tweets`);
+    return finish().success(`Published ${count} tweets`);
 };
 
-module.exports.sendDownloadLink = async (event, context, callback) => {
-    const cache = await makeCache();
-    const twitter = makeTwitter(cache);
-
+module.exports.sendDownloadLink = async (event, context) => {
     const tweets = sns.getPayloadFromSnsEvent(event);
     const tweetObjects = await twitter.getActualTweetsReferenced(tweets);
     let results = await Promise.all(tweetObjects.map((tweetObject) => {
@@ -42,36 +37,31 @@ module.exports.sendDownloadLink = async (event, context, callback) => {
 
     results = results.filter(r => r !== null);
     cloudwatch.logResults(results);
-    finish(callback, cache).success(`Processed ${tweets.length} tasks`);
+    return finish().success(`Processed ${tweets.length} tasks`);
 };
 
-module.exports.retryFailedTasks = async (event, context, callback) => {
-    const cache = await makeCache();
+module.exports.retryFailedTasks = async (event, context) => {
     const tweets = await cache.lrangeAsync('Fail', 0, -1);
 
     if (!tweets.length) {
-        finish(callback, cache).success(`No tasks for retrying`);
-        return;
+        return finish().success(`No tasks for retrying`);
     }
     await sns.sendToSns(tweets.map(JSON.parse));
     await cache.delAsync('Fail');
-    finish(callback, cache).success(`Sent ${tweets.length} tasks for retrying`);
+    return finish().success(`Sent ${tweets.length} tasks for retrying`);
 };
 
-module.exports.getDownloads = async (event, context, callback) => {
+module.exports.getDownloads = async (event, context) => {
     const username = event.pathParameters.username;
     switch (username) {
         case null:
         case undefined:
         case '':
-            finish(callback).render('home', { link: getSponsoredLink() });
-            return;
+            return finish().render('home', { link: getSponsoredLink() });
         case 'faq':
             const faqs = require('./faqs');
-            finish(callback).render('faq', { faqs, link: getSponsoredLink() });
-            return;
+            return finish().render('faq', { faqs, link: getSponsoredLink() });
         default:
-            const cache = await makeCache();
             let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
@@ -80,10 +70,10 @@ module.exports.getDownloads = async (event, context, callback) => {
             };
             downloads = downloads.map(prepareDownloadforFrontend);
 
-            finish(callback, cache).render('downloads', {username, downloads, link: getSponsoredLink()});
+            return finish().render('downloads', {username, downloads, link: getSponsoredLink()});
     }
 };
 
-module.exports.getHomePage = (event, context, callback) => {
-    finish(callback).render('home',  { link: getSponsoredLink() });
+module.exports.getHomePage = async (event, context) => {
+    return finish().render('home',  { link: getSponsoredLink() });
 };

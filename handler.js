@@ -77,3 +77,18 @@ module.exports.getDownloads = async (event, context) => {
 module.exports.getHomePage = async (event, context) => {
     return finish().render('home',  { link: getSponsoredLink() });
 };
+
+module.exports.storeFirebaseToken = async (event, context, callback) => {
+    const body = JSON.parse(event.body);
+    console.log(body);
+    const { username, token } = body;
+    await cache.setAsync(`fbtoken-${username}`, token);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({status: "success"}),
+        headers: {
+            'Access-Control-Allow-Origin': 'thisvid.space',
+        },
+    };
+};

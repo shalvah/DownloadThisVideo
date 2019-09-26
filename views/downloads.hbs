@@ -1,7 +1,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico"
+          type="image/x-icon"/>
 
     <style>
         body {
@@ -44,6 +45,12 @@
         <br>
     {{/each}}
 
+    <div id="permission_div" style="display: none;">
+        <h4>Needs Permission</h4>
+        <p id="token"></p>
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"
+                onclick="requestPermission()">Request Permission</button>
+    </div>
 </div>
 
 <footer style="margin-bottom: 0; padding-bottom: 0">
@@ -63,4 +70,145 @@
         </small>
     </div>
 </footer>
+
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
+
+<script>
+    function enableBetaIfRequested() {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search);
+        if (params.has('beta')) {
+            window.inBeta = true;
+            document.getElementById('permission_div').style.display = "visible";
+            enableAndConfigurePushNotifications();
+        }
+    }
+
+    enableBetaIfRequested();
+</script>
+
+<script>
+    function enableAndConfigurePushNotifications() {
+        if (!window.inBeta) {
+            return;
+        }
+
+        initializeFirebase();
+
+        setTokenRefreshHandler();
+
+        setNewMessageHandler();
+
+    }
+
+    function initializeFirebase() {
+        var firebaseConfig = {
+            apiKey: "AIzaSyCj2NkmY_s5WaIrTppLiXyavurIuFiW9N4",
+            authDomain: "downloadthisvideo-662ae.firebaseapp.com",
+            databaseURL: "https://downloadthisvideo-662ae.firebaseio.com",
+            projectId: "downloadthisvideo-662ae",
+            storageBucket: "",
+            messagingSenderId: "118497632459",
+            appId: "1:118497632459:web:c5a53bf01c2547a9fbfb4e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.messaging = firebase.messaging();
+        messaging.usePublicVapidKey("BPWZObbrWgRIOpHwSfJBAHh2GLMFcTFX2tYzrBPE5-_yGTeg_EY7bo5naJ2zFLoAZW1Vf5U3wcZUraZLxHA6rWU");
+    }
+
+    function setTokenRefreshHandler() {
+        messaging.onTokenRefresh(() => {
+            messaging.getToken()
+                    .then((refreshedToken) => {
+                        console.log('Token refreshed.');
+                        setTokenSentToServer(false);
+                        sendTokenToServer(refreshedToken);
+                        resetUI();
+                    })
+                    .catch((err) => {
+                        console.log('Unable to retrieve refreshed token ', err);
+                    });
+        });
+    }
+
+    function setNewMessageHandler() {
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            if (Notification.permission == 'granted') {
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    reg.showNotification(payload.title, {data: payload.username});
+                });
+            }
+        });
+    }
+
+    function resetUI() {
+        messaging.getToken().then((currentToken) => {
+            if (currentToken && !isTokenSentToServer()) {
+                sendTokenToServer(currentToken);
+                updateUIForPushEnabled(currentToken);
+            } else {
+                console.log('No Instance ID token available. Request permission to generate one.');
+                updateUIForPushPermissionRequired();
+                setTokenSentToServer(false);
+            }
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+            setTokenSentToServer(false);
+        });
+    }
+
+    function updateUIForPushEnabled() {
+        // Here you hide the button that they can click to trigger permission request
+    }
+
+    function updateUIForPushPermissionRequired() {
+        // Here you just show the button that they can click to trigger permission request
+    }
+
+    function sendTokenToServer(currentToken) {
+        if (!isTokenSentToServer()) {
+            console.log('Sending token to server...');
+            fetch("_/fbt", {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify({ username, token: currentToken }),
+                redirect: 'follow',
+                headers: { 'Content-Type': 'application/json' },
+            }).then(r => {
+                if (r.ok) {
+                    console.log("Token sent to server successfully");
+                    setTokenSentToServer(true);
+                } else {
+                    console.log("Token failed to send to server");
+                    r.json().then(console.log);
+                }
+            });
+        } else {
+            console.log('Token already sent to server so won\'t send it again ' +
+                    'unless it changes');
+        }
+    }
+
+    function setTokenSentToServer(sent) {
+        window.localStorage.setItem('sentToServer', sent ? '1' : '0');
+    }
+
+    function isTokenSentToServer() {
+        return window.localStorage.getItem('sentToServer') == '1';
+    }
+
+    function requestPermission() {
+        Notification.requestPermission()
+                .then((permission) => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        resetUI();
+                    } else {
+                        console.log('Unable to get permission to notify.');
+                    }
+                });
+    }
+</script>
 </body>

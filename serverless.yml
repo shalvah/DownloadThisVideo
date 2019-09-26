@@ -78,6 +78,15 @@ functions:
     - name: functionDuration
       threshold: 5000
 
+  fbt:
+    handler: handler.storeFirebaseToken
+    events:
+      - http:
+          path: /_/fbt
+          method: post
+          cors:
+            origins: thisvid.space
+
   getDownloads:
     handler: handler.getDownloads
     events:

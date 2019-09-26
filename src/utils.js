@@ -79,13 +79,13 @@ const finish = (cb = () => {}, cache = null) => {
             return response;
         },
 
-        sendFile(filename) {
+        sendFile(filename, headers = {"content-type": "text/html; charset=utf-8"}) {
             const filePath = path.resolve(__dirname, '..', 'assets', filename);
             let text = fs.readFileSync(filePath, "utf8");
 
             const response = {
                 statusCode: 200,
-                headers: {"content-type": "text/html; charset=utf-8"},
+                headers,
                 text,
             };
             cb(null, response);

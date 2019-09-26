@@ -204,7 +204,8 @@
         const params = new URLSearchParams(url.search);
         if (params.has('beta')) {
             window.inBeta = true;
-            document.getElementById('permission_div').style.display = "visible";
+            console.log("Enabled beta");
+            document.getElementById('permission_div').style.display = "block";
             enableAndConfigurePushNotifications();
         }
     }

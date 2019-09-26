@@ -56,6 +56,8 @@ module.exports.getDownloads = async (event, context) => {
     switch (username) {
         case null:
         case undefined:
+        case 'firebase-messaging-sw.js':
+            return finish().sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
         case '':
             return finish().render('home', { link: getSponsoredLink() });
         case 'faq':

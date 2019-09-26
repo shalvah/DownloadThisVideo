@@ -75,20 +75,6 @@
 <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
 
 <script>
-    function enableBetaIfRequested() {
-        const url = new URL(window.location);
-        const params = new URLSearchParams(url.search);
-        if (params.has('beta')) {
-            window.inBeta = true;
-            document.getElementById('permission_div').style.display = "visible";
-            enableAndConfigurePushNotifications();
-        }
-    }
-
-    enableBetaIfRequested();
-</script>
-
-<script>
     function enableAndConfigurePushNotifications() {
         if (!window.inBeta) {
             return;
@@ -210,5 +196,19 @@
                     }
                 });
     }
+</script>
+
+<script>
+    function enableBetaIfRequested() {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search);
+        if (params.has('beta')) {
+            window.inBeta = true;
+            document.getElementById('permission_div').style.display = "visible";
+            enableAndConfigurePushNotifications();
+        }
+    }
+
+    enableBetaIfRequested();
 </script>
 </body>

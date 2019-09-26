@@ -12,8 +12,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-const messaging = firebase.messaging();
-messaging.usePublicVapidKey("BPWZObbrWgRIOpHwSfJBAHh2GLMFcTFX2tYzrBPE5-_yGTeg_EY7bo5naJ2zFLoAZW1Vf5U3wcZUraZLxHA6rWU");/*
+const messaging = firebase.messaging();/*
 
 messaging.setBackgroundMessageHandler(function(payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);

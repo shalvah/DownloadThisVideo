@@ -153,10 +153,11 @@
     function sendTokenToServer(currentToken) {
         if (!isTokenSentToServer()) {
             console.log('Sending token to server...');
+            const username = window.location.pathname.replace("/");
             fetch("_/fbt", {
                 method: 'POST',
                 mode: 'cors',
-                body: JSON.stringify({ username, token: currentToken }),
+                body: JSON.stringify({ username , token: currentToken }),
                 redirect: 'follow',
                 headers: { 'Content-Type': 'application/json' },
             }).then(r => {

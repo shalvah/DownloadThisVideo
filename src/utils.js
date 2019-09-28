@@ -32,24 +32,42 @@ const get = (object, path) => {
     return lookup;
 };
 
-const finish = (cb = () => {}, cache = null) => {
+const finish = (cache = null) => {
     if (cache) cache.quit();
 
     return {
         success(body) {
             console.log(`Response: ${body}`);
-            const response = {
-                statusCode: 200,
-                body
-            };
-            cb(null, response);
             return response;
+        },
+
+        successHttp(body, headers = {
+            'Access-Control-Allow-Origin': 'thisvid.space',
+            "content-type": "application/json",
+        }) {
+            console.log(`Response: ${JSON.stringify(body)}`);
+            return {
+                statusCode: 200,
+                body: JSON.stringify(body),
+                headers,
+            };
         },
 
         fail(body) {
             console.log(`Fail response: ${body}`);
-            cb(body);
             return body;
+        },
+
+        failHttp(body, headers = {
+            'Access-Control-Allow-Origin': 'thisvid.space',
+            "content-type": "application/json",
+        }) {
+            console.log(`Failure response: ${JSON.stringify(body)}`);
+            return {
+                statusCode: 400,
+                body: JSON.stringify(body),
+                headers,
+            };
         },
 
         render(view, data = null) {
@@ -58,38 +76,32 @@ const finish = (cb = () => {}, cache = null) => {
 
             if (!data) {
                 // no need to bother compiling Handlebars template
-                const response = {
+                return {
                     statusCode: 200,
                     headers: {"content-type": "text/html; charset=utf-8"},
                     body
                 };
-                cb(null, response);
-                return response;
             }
 
             let template = hbs.compile(body);
             body = template(data);
 
-            const response = {
+            return {
                 statusCode: 200,
                 headers: {"content-type": "text/html"},
                 body
             };
-            cb(null, response);
-            return response;
         },
 
         sendFile(filename, headers = {"content-type": "text/html; charset=utf-8"}) {
             const filePath = path.resolve(__dirname, '..', 'assets', filename);
             let body = fs.readFileSync(filePath, "utf8");
 
-            const response = {
+            return {
                 statusCode: 200,
                 headers,
                 body,
             };
-            cb(null, response);
-            return response;
         }
     }
 };

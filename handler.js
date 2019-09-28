@@ -2,7 +2,7 @@
 
 const cache = require('./src/services/cache');
 
-const { finish, getRelativeTime, getSponsoredLink } = require('./src/utils');
+const {finish, getRelativeTime, getSponsoredLink} = require('./src/utils');
 const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
@@ -59,10 +59,10 @@ module.exports.getDownloads = async (event, context) => {
         case 'firebase-messaging-sw.js':
             return finish().sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
         case '':
-            return finish().render('home', { link: getSponsoredLink() });
+            return finish().render('home', {link: getSponsoredLink()});
         case 'faq':
             const faqs = require('./faqs');
-            return finish().render('faq', { faqs, link: getSponsoredLink() });
+            return finish().render('faq', {faqs, link: getSponsoredLink()});
         default:
             let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {
@@ -77,20 +77,33 @@ module.exports.getDownloads = async (event, context) => {
 };
 
 module.exports.getHomePage = async (event, context) => {
-    return finish().render('home',  { link: getSponsoredLink() });
+    return finish().render('home', {link: getSponsoredLink()});
 };
 
 module.exports.storeFirebaseToken = async (event, context, callback) => {
     const body = JSON.parse(event.body);
     console.log(body);
-    const { username, token } = body;
-    await cache.setAsync(`fbtoken-${username}`, token);
+    const {username, token} = body;
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify({status: "success"}),
-        headers: {
-            'Access-Control-Allow-Origin': 'thisvid.space',
-        },
+    let existing = JSON.parse(await cache.getAsync(`fbtoken-${username}`));
+    if (existing && existing.authed) {
+        existing.token = token;
+        console.log("Updating fbtoken for " + username);
+        let result = await cache.setAsync(`fbtoken-${username}`, JSON.stringify(existing));
+        return result
+            ? finish().successHttp({status: "success"})
+            : finish().failHttp({status: "fail"});
+    }
+
+    const tweetIds = ["1075701130812948480", "1095308222276218884", "1075513980666474496", "1064326221901824000"];
+    const data = {
+        token,
+        authed: false,
+        tweetForAuth: tweetIds.random()
     };
+    console.log("Saving fbtoken for " + username);
+    let result = await cache.setAsync(`fbtoken-${username}`, JSON.stringify(data), 'EX', 30 * 60);
+    return result
+        ? finish().successHttp({status: "success", tweetForAuth})
+        : finish().failHttp({status: "fail"});
 };

@@ -153,7 +153,7 @@
     function sendTokenToServer(currentToken) {
         if (!isTokenSentToServer()) {
             console.log('Sending token to server...');
-            const username = window.location.pathname.replace("/");
+            const username = window.location.pathname.replace("/", "");
             fetch("_/fbt", {
                 method: 'POST',
                 mode: 'cors',

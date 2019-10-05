@@ -113,8 +113,6 @@ const createSnsEvent = (numberOfTweets) => {
 module.exports = {
     createTweet,
     createRetweet,
-    createTweetCreateEvent,
     createUser,
-    createWebhookEvent,
     createSnsEvent,
 };

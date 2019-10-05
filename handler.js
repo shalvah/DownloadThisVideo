@@ -7,6 +7,7 @@ const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
 const twitter = require('./src/services/factory.twitter')(cache);
+const chunk = require("lodash.chunk");
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
     let lastTweetRetrieved = null;
@@ -27,16 +28,20 @@ module.exports.fetchTweetsToDownload = async (event, context) => {
 
 module.exports.sendDownloadLink = async (event, context) => {
     const tweets = sns.getPayloadFromSnsEvent(event);
-    const tweetObjects = await twitter.getActualTweetsReferenced(tweets);
-    let results = await Promise.all(tweetObjects.map((tweetObject) => {
-        let tweet = tweets.find(t => t.referencing_tweet === tweetObject.id_str);
-        return ops.extractVideoLink(tweetObject, {cache, twitter})
-            .then(link => ops.handleTweetProcessingSuccess(tweet, link, {cache, twitter}))
-            .catch(e => ops.handleTweetProcessingError(e, tweet, {cache, twitter, tweetObject}));
-    }));
+    // The lookup endpoint only allows fetching 100 tweets at a time
+    const chunks = chunk(tweets, 100);
+    await Promise.all(chunks.map(async chunk => {
+        const tweetObjects = await twitter.getActualTweetsReferenced(chunk);
+        let results = await Promise.all(tweetObjects.map((tweetObject) => {
+            let tweet = chunk.find(t => t.referencing_tweet === tweetObject.id_str);
+            return ops.extractVideoLink(tweetObject, {cache, twitter})
+                .then(link => ops.handleTweetProcessingSuccess(tweet, link, {cache, twitter}))
+                .catch(e => ops.handleTweetProcessingError(e, tweet, {cache, twitter, tweetObject}));
+        }));
 
-    results = results.filter(r => r !== null);
-    cloudwatch.logResults(results);
+        results = results.filter(r => r !== null);
+        return cloudwatch.logResults(results);
+    }));
     return finish().success(`Processed ${tweets.length} tasks`);
 };
 
@@ -99,11 +104,10 @@ module.exports.storeFirebaseToken = async (event, context, callback) => {
     const data = {
         token,
         authed: false,
-        tweetForAuth: tweetIds.random()
     };
     console.log("Saving fbtoken for " + username);
     let result = await cache.setAsync(`fbtoken-${username}`, JSON.stringify(data), 'EX', 30 * 60);
     return result
-        ? finish().successHttp({status: "success", tweetForAuth})
+        ? finish().successHttp({status: "success"})
         : finish().failHttp({status: "fail"});
 };

@@ -38,7 +38,7 @@ const finish = (cache = null) => {
     return {
         success(body) {
             console.log(`Response: ${body}`);
-            return response;
+            return body;
         },
 
         successHttp(body, headers = {

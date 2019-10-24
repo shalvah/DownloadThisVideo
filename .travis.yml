@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- "8.10"
+- "10.13"
 
 env:
 - SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space

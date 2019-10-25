@@ -62,10 +62,7 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
     switch (username) {
         case 'firebase-messaging-sw.js':
             return finish()
-                .sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
-        case 'sponsored-logo.png':
-            return finish()
-                .sendFile('sponsored-logo.png', {'content-type': 'image/png'});
+                .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
         case 'faq':
             const faqs = require('./faqs');
             return finish().render('faq', {faqs, link: getSponsoredLink()});

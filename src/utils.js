@@ -93,7 +93,7 @@ const finish = (cache = null) => {
             };
         },
 
-        sendFile(filename, headers = {"content-type": "text/html; charset=utf-8"}) {
+        sendTextFile(filename, headers = {"content-type": "text/html; charset=utf-8"}) {
             const filePath = path.resolve(__dirname, '..', 'assets', filename);
             let body = fs.readFileSync(filePath, "utf8");
 

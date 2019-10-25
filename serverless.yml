@@ -87,8 +87,8 @@ functions:
           cors:
             origins: thisvid.space
 
-  getDownloads:
-    handler: handler.getDownloads
+  getDownloadsOrStaticFiles:
+    handler: handler.getDownloadsOrStaticFiles
     events:
     - http:
         path: /{username}

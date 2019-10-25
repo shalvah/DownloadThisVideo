@@ -56,18 +56,22 @@ module.exports.retryFailedTasks = async (event, context) => {
     return finish().success(`Sent ${tweets.length} tasks for retrying`);
 };
 
-module.exports.getDownloads = async (event, context) => {
-    const username = event.pathParameters.username;
+module.exports.getDownloadsOrStaticFiles = async (event, context) => {
+    let username = event.pathParameters.username;
+    username = u
     switch (username) {
-        case null:
-        case undefined:
         case 'firebase-messaging-sw.js':
-            return finish().sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
-        case '':
-            return finish().render('home', {link: getSponsoredLink()});
+            return finish()
+                .sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
+        case 'sponsored-logo.png':
+            return finish().sendFile('sponsored-logo.png', {'content-type': 'image/png'});
         case 'faq':
             const faqs = require('./faqs');
             return finish().render('faq', {faqs, link: getSponsoredLink()});
+        case null:
+        case undefined:
+        case '':
+            return finish().render('home', {link: getSponsoredLink()});
         default:
             let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {

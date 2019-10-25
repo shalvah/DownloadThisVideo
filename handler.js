@@ -58,13 +58,14 @@ module.exports.retryFailedTasks = async (event, context) => {
 
 module.exports.getDownloadsOrStaticFiles = async (event, context) => {
     let username = event.pathParameters.username;
-    username = u
+    username = typeof username == "string" ? username.replace(/\/$/, '') : username;
     switch (username) {
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
         case 'sponsored-logo.png':
-            return finish().sendFile('sponsored-logo.png', {'content-type': 'image/png'});
+            return finish()
+                .sendFile('sponsored-logo.png', {'content-type': 'image/png'});
         case 'faq':
             const faqs = require('./faqs');
             return finish().render('faq', {faqs, link: getSponsoredLink()});

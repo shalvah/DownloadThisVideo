@@ -21,7 +21,6 @@
 
         footer {
             text-align: center;
-            padding-bottom: 10px;
         }
 
         a {
@@ -36,7 +35,7 @@
 <div class="content">
     <h2>{{ username }}'s downloads</h2>
     <p>
-        <small>Downloads you've requested via @this_vid in the past 48 hours show up here.</small>
+        <small>Downloads you've requested via <a href="https://twitter.com/this_vid">@this_vid on Twitter</a> in the past 48 hours show up here.</small>
     </p>
     {{#each downloads }}
         <small>{{ this.time }}</small>
@@ -56,7 +55,8 @@
 <footer style="margin-bottom: 0; padding-bottom: 0">
     <div>
         <small>
-            <a href="{{{ link.url }}}"><b>Sponsored: </b>{{ link.text }}</a>
+            <b>Sponsored: </b><a href="{{{ link.url }}}">
+            <img src="sponsored-logo.png" style="height: 1.5em; vertical-align: middle;">{{ link.text }}</a>
         </small>
     </div>
     <br>
@@ -64,7 +64,7 @@
         <small>
             <a href="https://www.patreon.com/shalvah">Support @this_vid</a>
             &nbsp;|&nbsp;
-            <a href="./faq">See our FAQ</a>
+            <a href="./faq">See the FAQ</a>
             &nbsp;|&nbsp;
             <a href="https://github.com/shalvah/DownloadThisVideo">Check out the source code</a>
         </small>

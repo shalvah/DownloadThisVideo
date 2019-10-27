@@ -92,23 +92,22 @@ module.exports.storeFirebaseToken = async (event, context, callback) => {
     console.log(body);
     const {username, token} = body;
 
-    let existing = JSON.parse(await cache.getAsync(`fbtoken-${username}`));
+    let existing = JSON.parse(await cache.getAsync(`settings-${username}`));
     if (existing && existing.authed) {
-        existing.token = token;
+        existing.fbToken = token;
         console.log("Updating fbtoken for " + username);
-        let result = await cache.setAsync(`fbtoken-${username}`, JSON.stringify(existing));
+        let result = await cache.setAsync(`settings-${username}`, JSON.stringify(existing));
         return result
             ? finish().successHttp({status: "success"})
             : finish().failHttp({status: "fail"});
     }
 
-    const tweetIds = ["1075701130812948480", "1095308222276218884", "1075513980666474496", "1064326221901824000"];
     const data = {
-        token,
+        fbToken: token,
         authed: false,
     };
-    console.log("Saving fbtoken for " + username);
-    let result = await cache.setAsync(`fbtoken-${username}`, JSON.stringify(data), 'EX', 30 * 60);
+    console.log("Saving settings for " + username);
+    let result = await cache.setAsync(`settings-${username}`, JSON.stringify(data), 'EX', 30 * 60);
     return result
         ? finish().successHttp({status: "success"})
         : finish().failHttp({status: "fail"});

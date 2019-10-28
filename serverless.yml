@@ -31,6 +31,7 @@ provider:
     TWITTER_CONSUMER_SECRET: ${env:TWITTER_CONSUMER_SECRET}
     TWITTER_ACCESS_TOKEN: ${env:TWITTER_ACCESS_TOKEN}
     TWITTER_ACCESS_TOKEN_SECRET: ${env:TWITTER_ACCESS_TOKEN_SECRET}
+    TWITTER_CALLBACK_URL: ${env:TWITTER_CALLBACK_URL}
     REDIS_HOSTNAME: ${env:REDIS_HOSTNAME}
     REDIS_PORT: ${env:REDIS_PORT}
     REDIS_PASSWORD: ${env:REDIS_PASSWORD}
@@ -78,11 +79,11 @@ functions:
     - name: functionDuration
       threshold: 5000
 
-  fbt:
-    handler: handler.storeFirebaseToken
+  startTwitterSignIn:
+    handler: handler.startTwitterSignIn
     events:
       - http:
-          path: /_/fbt
+          path: /_/starttwittersignin
           method: post
           cors:
             origins: thisvid.space

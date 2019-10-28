@@ -8,6 +8,7 @@ const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
 const twitter = require('./src/services/factory.twitter')(cache);
 const chunk = require("lodash.chunk");
+const twitterAPI = require('node-twitter-api');
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
     let lastTweetRetrieved = null;
@@ -87,7 +88,7 @@ module.exports.getHomePage = async (event, context) => {
     return finish().render('home', {link: getSponsoredLink()});
 };
 
-module.exports.storeFirebaseToken = async (event, context, callback) => {
+module.exports.storeFirebaseToken = async (event, context) => {
     const body = JSON.parse(event.body);
     console.log(body);
     const {username, token} = body;
@@ -95,7 +96,8 @@ module.exports.storeFirebaseToken = async (event, context, callback) => {
     let existing = JSON.parse(await cache.getAsync(`settings-${username}`));
     if (existing && existing.authed) {
         existing.fbToken = token;
-        console.log("Updating fbtoken for " + username);
+        existing.notifications = "enabled",
+            console.log("Updating fbtoken for " + username);
         let result = await cache.setAsync(`settings-${username}`, JSON.stringify(existing));
         return result
             ? finish().successHttp({status: "success"})
@@ -104,6 +106,7 @@ module.exports.storeFirebaseToken = async (event, context, callback) => {
 
     const data = {
         fbToken: token,
+        notifications: "disabled",
         authed: false,
     };
     console.log("Saving settings for " + username);
@@ -111,4 +114,36 @@ module.exports.storeFirebaseToken = async (event, context, callback) => {
     return result
         ? finish().successHttp({status: "success"})
         : finish().failHttp({status: "fail"});
+};
+
+module.exports.startTwitterSignIn = (event, context, callback) => {
+    context.callbackWaitsForEmptyEventLoop = false
+
+    if (!(event.queryStringParameters && event.queryStringParameters.fbtoken)) {
+        return callback(new Error('Missing token in query params'));
+    }
+
+    const token = event.queryStringParameters.fbtoken;
+
+    const twitter = new twitterAPI({
+        consumer_key: process.env.TWITTER_CONSUMER_KEY,
+        consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+        callback: process.env.TWITTER_CALLBACK_URL + `?fbtoken=${token}`,
+        x_auth_access_type: "read",
+    });
+    twitter.getRequestToken(function (error, requestToken, requestTokenSecret, results) {
+        if (error) {
+            console.log("Error getting OAuth request token : " + error);
+            return callback(error);
+        } else {
+            //store token and tokenSecret somewhere, you'll need them later;
+            const redirect = {
+                statusCode: 301,
+                headers: {
+                    Location: 'https://api.twitter.com/oauth/authenticate?oauth_token=' + requestToken,
+                }
+            };
+            return callback(null, redirect);
+        }
+    });
 };

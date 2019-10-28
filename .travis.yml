@@ -3,7 +3,7 @@ node_js:
 - "10.13"
 
 env:
-- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space
+- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space TWITTER_CALLBACK_URL=http://thisvid.space/_/completetwittersignin
 
 cache:
   directories:

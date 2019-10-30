@@ -84,9 +84,14 @@ functions:
     events:
       - http:
           path: /_/starttwittersignin
-          method: post
-          cors:
-            origins: thisvid.space
+          method: get
+
+  completeTwitterSignIn:
+    handler: handler.completeTwitterSignIn
+    events:
+      - http:
+          path: /_/completetwittersignin
+          method: get
 
   getDownloadsOrStaticFiles:
     handler: handler.getDownloadsOrStaticFiles

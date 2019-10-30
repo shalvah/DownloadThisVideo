@@ -138,6 +138,7 @@
             messaging.getToken()
                     .then((token) => {
                         if (token == params.get('fbt')) {
+                            console.log("Tokens match; saved");
                             setTokenSentToServer(true);
                         } else {
                             console.log("Tokens don't match");
@@ -198,7 +199,7 @@
     function enableBetaIfRequested() {
         const url = new URL(window.location);
         const params = new URLSearchParams(url.search);
-        if (params.has('beta')) {
+        if (params.has('beta') || params.has('fbt')) {
             window.inBeta = true;
             console.log("Enabled beta");
             document.getElementById('permission_div').style.display = "block";

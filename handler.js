@@ -8,7 +8,6 @@ const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
 const twitter = require('./src/services/factory.twitter')(cache);
 const chunk = require("lodash.chunk");
-const twitterAPI = require('node-twitter-api');
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
     let lastTweetRetrieved = null;
@@ -135,7 +134,7 @@ module.exports.startTwitterSignIn = async (event, context, callback) => {
     const redirect = {
         statusCode: 301,
         headers: {
-            Location: 'https://api.twitter.com/oauth/authenticate?screen_name=' + username + '&oauth_token=' + requestToken,
+            Location: 'https://api.twitter.com/oauth/authorize?screen_name=' + username + '&oauth_token=' + requestToken,
         }
     };
     return redirect;
@@ -149,9 +148,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
-    const requestToken = event.queryStringParameters.oauth_token;
 
-    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
     const {oauth_token} = twitter.getAccessToken(oauthVerifier);
     // We aren't really using the access token for anything;
     // we just needed a one-time Twitter authorization

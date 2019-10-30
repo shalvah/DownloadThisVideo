@@ -129,10 +129,47 @@ module.exports = (cache) => {
         }
         return t.post("https://api.twitter.com/oauth/request_token", {
             oauth_callback: callbackUrl,
-            x_auth_access_type: "read"
+            x_auth_access_type: 'read',
         }).then(r => {
             JSON.parse = originalJsonParse;
-            return require('querystring').decode(r.data);
+            try {
+                const data = JSON.parse(r.data);
+                if (data.errors) {
+                    return Promise.reject(data);
+                }
+            } catch {
+                return require('querystring').decode(r.data);
+            }
+        }).catch(e => {
+            JSON.parse = originalJsonParse;
+            throw e;
+        });
+    };
+
+    const getAccessToken = (requestToken) => {
+        const originalJsonParse = JSON.parse.bind(JSON);
+        JSON.parse = function (value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return value;
+            }
+        }
+        return t.post("https://api.twitter.com/oauth/access_token", {
+            oauth_verifier: requestToken,
+        }).then(r => {
+            JSON.parse = originalJsonParse;
+            try {
+                const data = JSON.parse(r.data);
+                if (data.errors) {
+                    return Promise.reject(data);
+                }
+            } catch {
+                return require('querystring').decode(r.data);
+            }
+        }).catch(e => {
+            JSON.parse = originalJsonParse;
+            throw e;
         });
     };
 
@@ -144,6 +181,7 @@ module.exports = (cache) => {
         getActualTweetsReferenced,
         fetchTweet,
         getRequestToken,
+        getAccessToken,
     };
 
 };

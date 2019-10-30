@@ -126,63 +126,46 @@ module.exports.startTwitterSignIn = async (event, context, callback) => {
     const token = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
 
-    const {oauth_token, oauth_token_secret: requestTokenSecret} = await twitter.getRequestToken(
+    const {oauth_token: requestToken, oauth_token_secret, oauth_callback_confirmed } = await twitter.getRequestToken(
         process.env.TWITTER_CALLBACK_URL + `?fbtoken=${token}&username=${username}`
     );
-    await cache.setAsync(
-        `requestTokenSecret-${username}`,
-        requestTokenSecret,
-        'EX', 30 * 60
-    )
+    if (!oauth_callback_confirmed ) {
+        throw new Error('OAuth callback not confirmed!');
+    }
     const redirect = {
         statusCode: 301,
         headers: {
-            Location: 'https://api.twitter.com/oauth/authenticate?screen_name=' + username + '&oauth_token=' + requestTokenSecret,
+            Location: 'https://api.twitter.com/oauth/authenticate?screen_name=' + username + '&oauth_token=' + requestToken,
         }
     };
     return redirect;
 };
 
-module.exports.completeTwitterSignIn = (event, context, callback) => {
-    context.callbackWaitsForEmptyEventLoop = false
-
+module.exports.completeTwitterSignIn = async (event, context) => {
     if (!(event.queryStringParameters && event.queryStringParameters.fbtoken)) {
         return callback(new Error('Missing fbtoken in query params'));
     }
 
-    const twitter = new twitterAPI({
-        consumer_key: process.env.TWITTER_CONSUMER_KEY,
-        consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    });
-    const token = event.queryStringParameters.fbtoken;
+    const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
     const requestToken = event.queryStringParameters.oauth_token;
 
-    cache.getAsync(`requestTokenSecret-${username}`)
-        .then((requestTokenSecret) => {
-            twitter.getAccessToken(requestToken, requestTokenSecret, oauthVerifier, (error, accessToken, accessTokenSecret, results) => {
-                if (error) {
-                    console.log("Error getting OAuth access token : " + JSON.stringify(error));
-                    return callback(error);
-                } else {
-                    const data = {
-                        fbToken: token,
-                        notifications: "enabled",
-                    };
-                    console.log("Saving settings for " + username);
-                    cache.setAsync(`settings-${username}`, JSON.stringify(data))
-                        .then(() => {
-                            const redirect = {
-                                statusCode: 301,
-                                headers: {
-                                    Location: `http://${process.env.EXTERNAL_URL}/${username}?notifications_enabled=success`
-                                }
-                            };
-                            return callback(null, redirect);
-                        });
-                }
-            });
-        });
-
+    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
+    const {oauth_token} = twitter.getAccessToken(oauthVerifier);
+    // We aren't really using the access token for anything;
+    // we just needed a one-time Twitter authorization
+    const data = {
+        fbToken: fbToken,
+        notifications: "enabled",
+    };
+    console.log("Saving settings for " + username, JSON.stringify(data));
+    await cache.setAsync(`settings-${username}`, JSON.stringify(data))
+    const redirect = {
+        statusCode: 301,
+        headers: {
+            Location: `http://${process.env.EXTERNAL_URL}/${username}?notifications_enabled=success`
+        }
+    };
+    return redirect;
 };

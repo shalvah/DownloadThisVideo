@@ -50,6 +50,9 @@
         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"
                 onclick="requestPermission()">Request Permission</button>
     </div>
+    <div>
+        <a id="twittersignin" style="display: none;" href="/_/starttwittersignin?username={{ username }}&fbtoken=">Sign in with Twitter to authorize notifications</a>
+    </div>
 </div>
 
 <footer style="margin-bottom: 0; padding-bottom: 0">
@@ -86,6 +89,8 @@
 
         setNewMessageHandler();
 
+        markTokenSentIfApplicable();
+
     }
 
     function initializeFirebase() {
@@ -106,8 +111,7 @@
                     .then((refreshedToken) => {
                         console.log('Token refreshed.');
                         setTokenSentToServer(false);
-                        sendTokenToServer(refreshedToken);
-                        resetUI();
+                        enableTwitterSignInLink(refreshedToken);
                     })
                     .catch((err) => {
                         console.log('Unable to retrieve refreshed token ', err);
@@ -126,11 +130,30 @@
         });
     }
 
+
+    function markTokenSentIfApplicable() {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search);
+        if (params.has('fbt')) {
+            messaging.getToken()
+                    .then((token) => {
+                        if (token == params.get('fbt')) {
+                            setTokenSentToServer(true);
+                        } else {
+                            console.log("Tokens don't match");
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('Unable to retrieve token ', err);
+                    });
+        }
+    }
+
     function resetUI() {
         messaging.getToken().then((currentToken) => {
             if (currentToken && !isTokenSentToServer()) {
-                sendTokenToServer(currentToken);
                 updateUIForPushEnabled(currentToken);
+                enableTwitterSignInLink(currentToken);
             } else {
                 console.log('No Instance ID token available. Request permission to generate one.');
                 updateUIForPushPermissionRequired();
@@ -143,36 +166,11 @@
     }
 
     function updateUIForPushEnabled() {
-        // Here you hide the button that they can click to trigger permission request
+        document.getElementById('permission_div').style.display = "block";
     }
 
     function updateUIForPushPermissionRequired() {
         // Here you just show the button that they can click to trigger permission request
-    }
-
-    function sendTokenToServer(currentToken) {
-        if (!isTokenSentToServer()) {
-            console.log('Sending token to server...');
-            const username = window.location.pathname.replace("/", "");
-            fetch("_/fbt", {
-                method: 'POST',
-                mode: 'cors',
-                body: JSON.stringify({ username , token: currentToken }),
-                redirect: 'follow',
-                headers: { 'Content-Type': 'application/json' },
-            }).then(r => {
-                if (r.ok) {
-                    console.log("Token sent to server successfully");
-                    setTokenSentToServer(true);
-                } else {
-                    console.log("Token failed to send to server");
-                    r.json().then(console.log);
-                }
-            });
-        } else {
-            console.log('Token already sent to server so won\'t send it again ' +
-                    'unless it changes');
-        }
     }
 
     function setTokenSentToServer(sent) {
@@ -206,6 +204,12 @@
             document.getElementById('permission_div').style.display = "block";
             enableAndConfigurePushNotifications();
         }
+    }
+
+    function enableTwitterSignInLink(fbtoken) {
+        const signInLink = document.querySelector('#twittersignin');
+        signInLink.href += fbtoken;
+        signInLink.style.display = 'block';
     }
 
     enableBetaIfRequested();

@@ -63,14 +63,15 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
-        case 'faq':
+        case 'faq': {
             const faqs = require('./faqs');
             return finish().render('faq', {faqs, link: getSponsoredLink()});
+        }
         case null:
         case undefined:
         case '':
             return finish().render('home', {link: getSponsoredLink()});
-        default:
+        default: {
             let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
@@ -80,6 +81,7 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             downloads = downloads.map(prepareDownloadforFrontend);
 
             return finish().render('downloads', {username, downloads, link: getSponsoredLink()});
+        }
     }
 };
 
@@ -142,7 +144,7 @@ module.exports.startTwitterSignIn = async (event, context, callback) => {
 
 module.exports.completeTwitterSignIn = async (event, context) => {
     if (!(event.queryStringParameters && event.queryStringParameters.fbtoken)) {
-        return callback(new Error('Missing fbtoken in query params'));
+        throw new Error('Missing fbtoken in query params');
     }
 
     const fbToken = event.queryStringParameters.fbtoken;

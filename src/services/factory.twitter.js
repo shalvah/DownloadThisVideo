@@ -145,7 +145,7 @@ module.exports = (cache) => {
                 if (data.errors) {
                     return Promise.reject(data);
                 }
-            } catch {
+            } catch (e) {
                 return require('querystring').decode(r.data);
             }
         }).catch(e => {
@@ -172,7 +172,7 @@ module.exports = (cache) => {
                 if (data.errors) {
                     return Promise.reject(data);
                 }
-            } catch {
+            } catch (e) {
                 return require('querystring').decode(r.data);
             }
         }).catch(e => {

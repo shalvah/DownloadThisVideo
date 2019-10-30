@@ -161,7 +161,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const redirect = {
         statusCode: 301,
         headers: {
-            Location: `http://${process.env.EXTERNAL_URL}/${username}?notifications_enabled=success`
+            Location: `http://${process.env.EXTERNAL_URL}/${username}?fbt=${fbToken}`
         }
     };
     return redirect;

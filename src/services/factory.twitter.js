@@ -117,13 +117,33 @@ module.exports = (cache) => {
             .catch(e => wrapTwitterErrors('statuses/show', e));
     };
 
+    const getRequestToken = (callbackUrl) => {
+        // Monkeypatching JSON.parse because https://github.com/ttezel/twit/issues/475#issuecomment-547688260
+        const originalJsonParse = JSON.parse.bind(JSON);
+        JSON.parse = function (value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return value;
+            }
+        }
+        return t.post("https://api.twitter.com/oauth/request_token", {
+            oauth_callback: callbackUrl,
+            x_auth_access_type: "read"
+        }).then(r => {
+            JSON.parse = originalJsonParse;
+            return require('querystring').decode(r.data);
+        });
+    };
+
     return {
         getMentions,
         reply,
         replyWithRedirect,
         shouldDownloadVid,
         getActualTweetsReferenced,
-        fetchTweet
+        fetchTweet,
+        getRequestToken,
     };
 
 };

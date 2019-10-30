@@ -89,34 +89,6 @@ module.exports.getHomePage = async (event, context) => {
     return finish().render('home', {link: getSponsoredLink()});
 };
 
-module.exports.storeFirebaseToken = async (event, context) => {
-    const body = JSON.parse(event.body);
-    console.log(body);
-    const {username, token} = body;
-
-    let existing = JSON.parse(await cache.getAsync(`settings-${username}`));
-    if (existing && existing.authed) {
-        existing.fbToken = token;
-        existing.notifications = "enabled",
-            console.log("Updating fbtoken for " + username);
-        let result = await cache.setAsync(`settings-${username}`, JSON.stringify(existing));
-        return result
-            ? finish().successHttp({status: "success"})
-            : finish().failHttp({status: "fail"});
-    }
-
-    const data = {
-        fbToken: token,
-        notifications: "disabled",
-        authed: false,
-    };
-    console.log("Saving settings for " + username);
-    let result = await cache.setAsync(`settings-${username}`, JSON.stringify(data), 'EX', 30 * 60);
-    return result
-        ? finish().successHttp({status: "success"})
-        : finish().failHttp({status: "fail"});
-};
-
 module.exports.startTwitterSignIn = async (event, context, callback) => {
     if (!(event.queryStringParameters
         && event.queryStringParameters.username
@@ -156,7 +128,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     // we just needed a one-time Twitter authorization
     const data = {
         fbToken: fbToken,
-        notifications: "enabled",
+        notifications: true,
     };
     console.log("Saving settings for " + username, JSON.stringify(data));
     await cache.setAsync(`settings-${username}`, JSON.stringify(data))

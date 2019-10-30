@@ -118,7 +118,8 @@ module.exports = (cache) => {
     };
 
     const getRequestToken = (callbackUrl) => {
-        // Monkeypatching JSON.parse because https://github.com/ttezel/twit/issues/475#issuecomment-547688260
+        // Monkey-patching JSON.parse because
+        // https://github.com/ttezel/twit/issues/475#issuecomment-547688260
         const originalJsonParse = JSON.parse.bind(JSON);
         JSON.parse = function (value) {
             try {
@@ -127,11 +128,18 @@ module.exports = (cache) => {
                 return value;
             }
         }
-        return t.post("https://api.twitter.com/oauth/request_token", {
-            oauth_callback: callbackUrl,
-            x_auth_access_type: 'read',
-        }).then(r => {
+
+        const url = "https://api.twitter.com/oauth/request_token";
+        const request = require("request");
+        const originalRequestPost = request.post;
+        request.post = (options) => {
+            options.oauth.callback = callbackUrl;
+            options.oauth.x_auth_access_type = 'read';
+            return originalRequestPost(options);
+        }
+        return t.post(url).then(r => {
             JSON.parse = originalJsonParse;
+            request.post = originalRequestPost;
             try {
                 const data = JSON.parse(r.data);
                 if (data.errors) {
@@ -142,6 +150,7 @@ module.exports = (cache) => {
             }
         }).catch(e => {
             JSON.parse = originalJsonParse;
+            request.post = originalRequestPost;
             throw e;
         });
     };
@@ -155,9 +164,8 @@ module.exports = (cache) => {
                 return value;
             }
         }
-        return t.post("https://api.twitter.com/oauth/access_token", {
-            oauth_verifier: requestToken,
-        }).then(r => {
+        return t.post(`https://api.twitter.com/oauth/access_token?oauth_verifier=${requestToken}`)
+            .then(r => {
             JSON.parse = originalJsonParse;
             try {
                 const data = JSON.parse(r.data);

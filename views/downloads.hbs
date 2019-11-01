@@ -85,6 +85,8 @@
 
         initializeFirebase();
 
+        resetUI();
+
         setTokenRefreshHandler();
 
         setNewMessageHandler();
@@ -142,7 +144,7 @@
         if (params.has('fbt')) {
             messaging.getToken()
                     .then((token) => {
-                        if (token == params.get('fbt')) {
+                        if (token === params.get('fbt')) {
                             console.log("Tokens match; saved");
                             setTokenSentToServer(true);
                         } else {
@@ -157,12 +159,14 @@
 
     function resetUI() {
         messaging.getToken().then((currentToken) => {
-            if (currentToken && !isTokenSentToServer()) {
+            if (currentToken) {
                 updateUIForPushEnabled(currentToken);
-                enableTwitterSignInLink(currentToken);
+                if (!isTokenSentToServer()) {
+                    enableTwitterSignInLink(currentToken);
+                }
             } else {
-                console.log('No Instance ID token available. Request permission to generate one.');
-                updateUIForPushPermissionRequired();
+                console.log('No Instance ID token available.');
+                document.getElementById('permission_div').style.display = "block";
                 setTokenSentToServer(false);
             }
         }).catch((err) => {
@@ -172,11 +176,7 @@
     }
 
     function updateUIForPushEnabled() {
-        document.getElementById('permission_div').style.display = "block";
-    }
-
-    function updateUIForPushPermissionRequired() {
-        // Here you just show the button that they can click to trigger permission request
+        document.getElementById('permission_div').style.display = "none";
     }
 
     function setTokenSentToServer(sent) {
@@ -192,7 +192,6 @@
                 .then((permission) => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted.');
-                        resetUI();
                     } else {
                         console.log('Unable to get permission to notify.');
                     }
@@ -208,9 +207,6 @@
             window.inBeta = true;
             console.log("Enabled beta");
             enableAndConfigurePushNotifications();
-        }
-        if (params.has('beta')) {
-            document.getElementById('permission_div').style.display = "block";
         }
     }
 

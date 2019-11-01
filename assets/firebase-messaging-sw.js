@@ -12,24 +12,19 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-const messaging = firebase.messaging();/*
+const messaging = firebase.messaging();
 
-messaging.setBackgroundMessageHandler(function(payload) {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    const notificationOptions = {
-        data: {
-            username
-        }
-    };
+messaging.setBackgroundMessageHandler((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-    return self.registration.showNotification('New download',
-        notificationOptions);
+  return self.registration.showNotification(payload.title,
+      {body: "Your video's ready!🎉", data: { username: payload.username}});
 });
 
 self.addEventListener('notificationclick', function(e) {
-    var notification = e.notification;
+    const notification = e.notification;
 
     clients.openWindow('http://thisvid.space/' + notification.data.username);
     notification.close();
 
-});*/
+});

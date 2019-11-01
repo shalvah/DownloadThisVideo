@@ -120,12 +120,17 @@
     }
 
     function setNewMessageHandler() {
-        messaging.onMessage((payload) => {
-            console.log('Message received. ', payload);
+        messaging.onMessage((data) => {
+            console.log('Message received. ', data);
             if (Notification.permission == 'granted') {
-                navigator.serviceWorker.getRegistration().then((reg) => {
-                    reg.showNotification(payload.title, {data: payload.username});
-                });
+                const notification = new Notification(data.title, {body: "Your download's ready!🎉", data: { username: data.username}});
+                notification.onclick = (event) => {
+                    event.preventDefault();
+                    location.reload();
+                    notification.close();
+                }
+            } else {
+                console.log("No notification permission")
             }
         });
     }
@@ -202,8 +207,10 @@
         if (params.has('beta') || params.has('fbt')) {
             window.inBeta = true;
             console.log("Enabled beta");
-            document.getElementById('permission_div').style.display = "block";
             enableAndConfigurePushNotifications();
+        }
+        if (params.has('beta')) {
+            document.getElementById('permission_div').style.display = "block";
         }
     }
 

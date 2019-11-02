@@ -78,14 +78,19 @@
 <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
 
 <script>
-    function enableAndConfigurePushNotifications() {
+    {{#if settings.fbToken }}
+    window.existingFbToken = "{{ settings.fbToken }}";
+    {{/if}}
+</script>
+<script>
+    function initializeAndConfigurePushNotifications() {
         if (!window.inBeta) {
             return;
         }
 
         initializeFirebase();
 
-        resetUI();
+        initializeNotificationsUI();
 
         setTokenRefreshHandler();
 
@@ -157,26 +162,29 @@
         }
     }
 
-    function resetUI() {
+    function initializeNotificationsUI() {
         messaging.getToken().then((currentToken) => {
-            if (currentToken) {
-                updateUIForPushEnabled(currentToken);
-                if (!isTokenSentToServer()) {
-                    enableTwitterSignInLink(currentToken);
-                }
+            console.log({ currentToken });
+            if (currentToken && window.existingFbToken && window.existingFbToken === currentToken) {
+                    // Notifications are enabled for this device
+                    hideEnableNotificationsPrompt();
             } else {
                 console.log('No Instance ID token available.');
-                document.getElementById('permission_div').style.display = "block";
-                setTokenSentToServer(false);
+                showEnableNotificationsPrompt()
             }
         }).catch((err) => {
             console.log('An error occurred while retrieving token. ', err);
-            setTokenSentToServer(false);
+            showEnableNotificationsPrompt();
         });
     }
 
-    function updateUIForPushEnabled() {
+    function hideEnableNotificationsPrompt() {
         document.getElementById('permission_div').style.display = "none";
+    }
+
+    function showEnableNotificationsPrompt() {
+        document.getElementById('permission_div').style.display = "block";
+        setTokenSentToServer(false);
     }
 
     function setTokenSentToServer(sent) {
@@ -192,10 +200,29 @@
                 .then((permission) => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted.');
+                        messaging.getToken().then((currentToken) => {
+                            console.log({ currentToken });
+                            if (currentToken) {
+                                hideEnableNotificationsPrompt();
+                                enableTwitterSignInLink();
+                            } else {
+                                console.log('No Instance ID token available.');
+                                showEnableNotificationsPrompt()
+                            }
+                        }).catch((err) => {
+                            console.log('An error occurred while retrieving token. ', err);
+                            showEnableNotificationsPrompt();
+                        });
                     } else {
                         console.log('Unable to get permission to notify.');
                     }
                 });
+    }
+
+    function enableTwitterSignInLink(fbtoken) {
+        const signInLink = document.querySelector('#twittersignin');
+        signInLink.href += fbtoken;
+        signInLink.style.display = 'block';
     }
 </script>
 
@@ -206,14 +233,8 @@
         if (params.has('beta') || params.has('fbt')) {
             window.inBeta = true;
             console.log("Enabled beta");
-            enableAndConfigurePushNotifications();
+            initializeAndConfigurePushNotifications();
         }
-    }
-
-    function enableTwitterSignInLink(fbtoken) {
-        const signInLink = document.querySelector('#twittersignin');
-        signInLink.href += fbtoken;
-        signInLink.style.display = 'block';
     }
 
     enableBetaIfRequested();

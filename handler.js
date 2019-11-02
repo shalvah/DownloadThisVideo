@@ -72,6 +72,8 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case '':
             return finish().render('home', {link: getSponsoredLink()});
         default: {
+            const settings = JSON.parse(await cache.getAsync(`settings-${username}`)) || {};
+
             let downloads = await ops.getUserDownloads(cache, username);
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
@@ -80,7 +82,7 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             };
             downloads = downloads.map(prepareDownloadforFrontend);
 
-            return finish().render('downloads', {username, downloads, link: getSponsoredLink()});
+            return finish().render('downloads', {username, downloads, settings, link: getSponsoredLink()});
         }
     }
 };
@@ -89,7 +91,7 @@ module.exports.getHomePage = async (event, context) => {
     return finish().render('home', {link: getSponsoredLink()});
 };
 
-module.exports.startTwitterSignIn = async (event, context, callback) => {
+module.exports.startTwitterSignIn = async (event, context) => {
     if (!(event.queryStringParameters
         && event.queryStringParameters.username
         && event.queryStringParameters.fbtoken)) {

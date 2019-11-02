@@ -24,7 +24,7 @@ messaging.setBackgroundMessageHandler((payload) => {
 self.addEventListener('notificationclick', function(e) {
     const notification = e.notification;
 
-    clients.openWindow('http://thisvid.space/' + notification.data.username);
+    clients.openWindow('https://thisvid.space/' + notification.data.username);
     notification.close();
 
 });

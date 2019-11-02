@@ -17,8 +17,8 @@ const messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-  return self.registration.showNotification(payload.title,
-      {body: "Your video's ready!🎉", data: { username: payload.username}});
+  return self.registration.showNotification(payload.data.title,
+      {body: "Your video's ready!🎉", data: { username: payload.data.username}});
 });
 
 self.addEventListener('notificationclick', function(e) {

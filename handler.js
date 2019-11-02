@@ -106,7 +106,7 @@ module.exports.startTwitterSignIn = async (event, context, callback) => {
         throw new Error('OAuth callback not confirmed!');
     }
     const redirect = {
-        statusCode: 301,
+        statusCode: 302,
         headers: {
             Location: 'https://api.twitter.com/oauth/authorize?screen_name=' + username + '&oauth_token=' + requestToken,
         }
@@ -133,7 +133,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     console.log("Saving settings for " + username, JSON.stringify(data));
     await cache.setAsync(`settings-${username}`, JSON.stringify(data))
     const redirect = {
-        statusCode: 301,
+        statusCode: 302,
         headers: {
             Location: `http://${process.env.EXTERNAL_URL}/${username}?fbt=${fbToken}`
         }

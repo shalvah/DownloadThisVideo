@@ -204,7 +204,7 @@
                             console.log({ currentToken });
                             if (currentToken) {
                                 hideEnableNotificationsPrompt();
-                                enableTwitterSignInLink();
+                                enableTwitterSignInLink(currentToken);
                             } else {
                                 console.log('No Instance ID token available.');
                                 showEnableNotificationsPrompt()

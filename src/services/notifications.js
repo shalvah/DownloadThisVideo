@@ -22,7 +22,7 @@ module.exports = {
                 token
             };
 
-            firebase.messaging().send(message)
+            return firebase.messaging().send(message)
                 .then((response) => {
                     console.log('notification.send.success:' + JSON.stringify(response));
                 })

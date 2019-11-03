@@ -3,9 +3,10 @@ require('dotenv').config({path: '.env.test'});
 
 const { createSnsEvent } = require("./support/utils");
 
-const { mockCache, mockTwitterAPI, mockMetrics } = require("./support/mocks");
+const { mockCache, mockTwitterAPI, mockMetrics, mockNotifications } = require("./support/mocks");
 const cache = mockCache();
 mockMetrics();
+mockNotifications();
 const requests = mockTwitterAPI();
 
 const sendDownloadLink = require('../handler').sendDownloadLink;

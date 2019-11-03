@@ -94,24 +94,15 @@ module.exports.getHomePage = async (event, context) => {
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({ event });
-    // For some reason, sometimes the event data comes in as a string.
-    // I think there's a bug with the Lambda proxy integration.
-    if (typeof event === "string") {
-        event = JSON.parse(event);
-    }
-    const queryParams = event.queryStringParameters;
-    if (!queryParams) {
-        throw new Error('No query params');
-    }
-    if (queryParams.action) {
-        if (queryParams.action !== "disable") {
+    if (event.queryStringParameters.action) {
+        if (event.queryStringParameters.action !== "disable") {
             throw new Error('Unknown value of action in query params');
         }
-    } else if (!queryParams.username || !queryParams.fbtoken) {
+    } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
         throw new Error('Missing fbtoken or username in query params');
     }
 
-    let {username, fbtoken: token, action} = queryParams;
+    let {username, fbtoken: token, action} = event.queryStringParameters;
     const callbackUrl = process.env.TWITTER_CALLBACK_URL
         + `?username=${username}`
         + (action ? `&action=${action}` : '')
@@ -130,25 +121,11 @@ module.exports.startTwitterSignIn = async (event, context) => {
 };
 
 module.exports.completeTwitterSignIn = async (event, context) => {
-    console.log(typeof event);
-    // For some reason, sometimes the event data comes in as a string.
-    // I think there's a bug with the Lambda proxy integration.
-    let queryParams;
-    if (typeof event === "string") {
-        const newEvent = JSON.parse(JSON.parse(event));
-        console.log({ newEvent });
-        queryParams = newEvent.queryStringParameters;
-    } else {
-        queryParams = event.queryStringParameters;
-    }
-    if (!queryParams) {
-        throw new Error('No query params');
-    }
-    if (queryParams.action) {
-        if (queryParams.action !== "disable") {
+    if (event.queryStringParameters.action) {
+        if (event.queryStringParameters.action !== "disable") {
             throw new Error('Unknown value of action in query params');
         }
-    } else if (!queryParams.username || !queryParams.fbtoken) {
+    } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
         throw new Error('Missing fbtoken or username in query params');
     }
 

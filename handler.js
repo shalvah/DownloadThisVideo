@@ -98,10 +98,10 @@ module.exports.startTwitterSignIn = async (event, context) => {
     }
     const queryParams = event.queryStringParameters;
     if (queryParams.action) {
-        if (!(queryParams.action !== "disable")) {
+        if (queryParams.action !== "disable") {
             throw new Error('Unknown value of action in query params');
         }
-    } else if (!(queryParams.username && queryParams.fbtoken)) {
+    } else if (!queryParams.username || !queryParams.fbtoken) {
         throw new Error('Missing fbtoken or username in query params');
     }
 
@@ -130,10 +130,10 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     }
     const queryParams = event.queryStringParameters;
     if (queryParams.action) {
-        if (!(queryParams.action !== "disable")) {
+        if (queryParams.action !== "disable") {
             throw new Error('Unknown value of action in query params');
         }
-    } else if (!(queryParams.username && queryParams.fbtoken)) {
+    } else if (!queryParams.username || !queryParams.fbtoken) {
         throw new Error('Missing fbtoken or username in query params');
     }
 

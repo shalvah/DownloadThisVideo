@@ -47,10 +47,14 @@
     {{/each}}
 
     <div id="permission_div" style="display: none;">
-        <h5>Psst! @this_vid can send you a push notification on your device for new downloads</h5>
-        <p id="token"></p>
+{{#if settings.notifications }}
+        <h5>You've got push notifications for downloads enabled on another device. Would you like to switch to this one?</h5>
+        <button onclick="requestPermission()">Switch notifications to this device</button>
+{{else }}
+        <h5>Psst! @this_vid can send you a push notification on your device for new downloads, if you like.</h5>
         <button onclick="requestPermission()">Enable notifications</button>
-    </div>
+{{/if}}
+</div>
     <div id="twittersignin" style="display: none;">
         Last step! <a href="/_/starttwittersignin?username={{ username }}&fbtoken=">Sign in with Twitter</a> to authorize notifications
     </div>

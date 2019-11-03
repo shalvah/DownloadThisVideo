@@ -54,7 +54,8 @@
             <button onclick="requestPermission()">Switch notifications to this device</button>
             <button onclick="turnOffNotifications()">Disable all notifications</button>
         {{else }}
-            <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you like.</small><br>
+            <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you
+                like.</small><br>
             <button onclick="requestPermission()">Enable notifications</button>
         {{/if}}
     </div>
@@ -68,223 +69,223 @@
         Last step! <a href="/_/starttwittersignin?username={{ username }}">Sign in with Twitter</a> to authorize
         this action.
     </div>
+</div>
+<footer style="margin-bottom: 0; padding-bottom: 0">
+    <div>
+        <small>
+            <b>Sponsored: </b><a href="{{{ link.url }}}">
+            <img
+                    src="https://github.com/shalvah/DownloadThisVideo/raw/master/assets/sponsored-logo.png"
+                    style="height: 1.5em; vertical-align: middle;">&nbsp;{{ link.text }}</a>
+        </small>
+    </div>
+    <br>
+    <div>
+        <small>
+            <a href="https://www.patreon.com/shalvah">Support @this_vid</a>
+            &nbsp;|&nbsp;
+            <a href="./faq">See the FAQ</a>
+            &nbsp;|&nbsp;
+            <a href="https://github.com/shalvah/DownloadThisVideo">Check out the source code</a>
+        </small>
+    </div>
+</footer>
 
-    <footer style="margin-bottom: 0; padding-bottom: 0">
-        <div>
-            <small>
-                <b>Sponsored: </b><a href="{{{ link.url }}}">
-                <img
-                        src="https://github.com/shalvah/DownloadThisVideo/raw/master/assets/sponsored-logo.png"
-                        style="height: 1.5em; vertical-align: middle;">&nbsp;{{ link.text }}</a>
-            </small>
-        </div>
-        <br>
-        <div>
-            <small>
-                <a href="https://www.patreon.com/shalvah">Support @this_vid</a>
-                &nbsp;|&nbsp;
-                <a href="./faq">See the FAQ</a>
-                &nbsp;|&nbsp;
-                <a href="https://github.com/shalvah/DownloadThisVideo">Check out the source code</a>
-            </small>
-        </div>
-    </footer>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
-
-    <script>
-            {{#if settings.fbToken }}
-            window.existingFbToken = "{{ settings.fbToken }}";
-            {{/if}}
-    </script>
-    <script>
-        function initializeAndConfigurePushNotifications() {
-            if (!window.inBeta) {
-                console.log("Not in beta.");
-                return;
-            }
-
-            if (!("serviceWorker" in navigator)) {
-                console.log("Service workers not supported.");
-                return;
-            }
-
-            initializeFirebase();
-
-            initializeNotificationsUI();
-
-            setTokenRefreshHandler();
-
-            setNewMessageHandler();
-
-            markTokenSentIfApplicable();
-
+<script>
+        {{#if settings.fbToken }}
+        window.existingFbToken = "{{ settings.fbToken }}";
+        {{/if}}
+</script>
+<script>
+    function initializeAndConfigurePushNotifications() {
+        if (!window.inBeta) {
+            console.log("Not in beta.");
+            return;
         }
 
-        function initializeFirebase() {
-            var firebaseConfig = {
-                apiKey: "AIzaSyCj2NkmY_s5WaIrTppLiXyavurIuFiW9N4",
-                projectId: "downloadthisvideo-662ae",
-                messagingSenderId: "118497632459",
-                appId: "1:118497632459:web:c5a53bf01c2547a9fbfb4e"
-            };
-            firebase.initializeApp(firebaseConfig);
-            window.messaging = firebase.messaging();
-            messaging.usePublicVapidKey("BPWZObbrWgRIOpHwSfJBAHh2GLMFcTFX2tYzrBPE5-_yGTeg_EY7bo5naJ2zFLoAZW1Vf5U3wcZUraZLxHA6rWU");
-
-            navigator.serviceWorker.register('/firebase-messaging-sw.js')
-                    .then(reg => console.log('Registered SW successfully', reg))
-                    .catch(err => console.log('Failed to register SW', err))
+        if (!("serviceWorker" in navigator)) {
+            console.log("Service workers not supported.");
+            return;
         }
 
-        function setTokenRefreshHandler() {
-            messaging.onTokenRefresh(() => {
-                messaging.getToken()
-                        .then((refreshedToken) => {
-                            console.log('Token refreshed.');
-                            setTokenSentToServer(false);
-                            enableTwitterSignInLink(refreshedToken);
-                        })
-                        .catch((err) => {
-                            console.log('Unable to retrieve refreshed token ', err);
-                        });
-            });
-        }
+        initializeFirebase();
 
-        function setNewMessageHandler() {
-            messaging.onMessage((payload) => {
-                console.log('Message received. ', payload);
-                if (Notification.permission == 'granted') {
-                    navigator.serviceWorker.getRegistration().then((reg) => {
-                        reg.showNotification(payload.data.title,
-                                {body: "Your video's ready!🎉", data: {username: payload.data.username}});
+        initializeNotificationsUI();
+
+        setTokenRefreshHandler();
+
+        setNewMessageHandler();
+
+        markTokenSentIfApplicable();
+
+    }
+
+    function initializeFirebase() {
+        var firebaseConfig = {
+            apiKey: "AIzaSyCj2NkmY_s5WaIrTppLiXyavurIuFiW9N4",
+            projectId: "downloadthisvideo-662ae",
+            messagingSenderId: "118497632459",
+            appId: "1:118497632459:web:c5a53bf01c2547a9fbfb4e"
+        };
+        firebase.initializeApp(firebaseConfig);
+        window.messaging = firebase.messaging();
+        messaging.usePublicVapidKey("BPWZObbrWgRIOpHwSfJBAHh2GLMFcTFX2tYzrBPE5-_yGTeg_EY7bo5naJ2zFLoAZW1Vf5U3wcZUraZLxHA6rWU");
+
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then(reg => console.log('Registered SW successfully', reg))
+                .catch(err => console.log('Failed to register SW', err))
+    }
+
+    function setTokenRefreshHandler() {
+        messaging.onTokenRefresh(() => {
+            messaging.getToken()
+                    .then((refreshedToken) => {
+                        console.log('Token refreshed.');
+                        setTokenSentToServer(false);
+                        enableTwitterSignInLink(refreshedToken);
+                    })
+                    .catch((err) => {
+                        console.log('Unable to retrieve refreshed token ', err);
                     });
-                } else {
-                    console.log("No notification permission")
-                }
-            });
-        }
+        });
+    }
 
-
-        function markTokenSentIfApplicable() {
-            const url = new URL(window.location);
-            const params = new URLSearchParams(url.search);
-            if (params.has('fbt')) {
-                messaging.getToken()
-                        .then((token) => {
-                            if (token === params.get('fbt')) {
-                                console.log("Tokens match; saved");
-                                setTokenSentToServer(true);
-                                location.href = location.origin + location.pathname + "?beta";
-                            } else {
-                                console.log("Tokens don't match");
-                            }
-                        })
-                        .catch((err) => {
-                            console.log('Unable to retrieve token ', err);
-                        });
+    function setNewMessageHandler() {
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            if (Notification.permission == 'granted') {
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    reg.showNotification(payload.data.title,
+                            {body: "Your video's ready!🎉", data: {username: payload.data.username}});
+                });
+            } else {
+                console.log("No notification permission")
             }
-        }
+        });
+    }
 
-        function initializeNotificationsUI() {
-            messaging.getToken().then((currentToken) => {
-                console.log({currentToken});
-                if (currentToken && window.existingFbToken && window.existingFbToken === currentToken) {
-                    // Notifications are enabled for this device
-                    hideEnableNotificationsPrompt();
-                    showAlreadyEnabledNotificationsPrompt();
-                } else {
-                    console.log('No Instance ID token available.');
-                    showEnableNotificationsPrompt()
-                }
-            }).catch((err) => {
-                console.log('An error occurred while retrieving token. ', err);
-                showEnableNotificationsPrompt();
-            });
-        }
 
-        function hideEnableNotificationsPrompt() {
-            document.getElementById('permission_div').style.display = "none";
-        }
-
-        function showEnableNotificationsPrompt() {
-            document.getElementById('permission_div').style.display = "block";
-            document.querySelector('#permission_div button').disabled = false;
-            document.querySelector('#permission_div button').textContent = "Enable notifications";
-            setTokenSentToServer(false);
-        }
-
-        function showAlreadyEnabledNotificationsPrompt() {
-            document.getElementById('enabled_div').style.display = "block";
-        }
-
-        function hideAlreadyEnabledNotificationsPrompt() {
-            document.getElementById('enabled_div').style.display = "none";
-        }
-
-        function setTokenSentToServer(sent) {
-            window.localStorage.setItem('sentToServer', sent ? '1' : '0');
-        }
-
-        function isTokenSentToServer() {
-            return window.localStorage.getItem('sentToServer') == '1';
-        }
-
-        function requestPermission() {
-            Notification.requestPermission()
-                    .then((permission) => {
-                        if (permission === 'granted') {
-                            console.log('Notification permission granted.');
-                            document.querySelector('#permission_div button').disabled = true;
-                            document.querySelector('#permission_div button').textContent = "Loading...";
-                            messaging.getToken().then((currentToken) => {
-                                console.log({currentToken});
-                                if (currentToken) {
-                                    hideEnableNotificationsPrompt();
-                                    enableTwitterSignInLink(currentToken);
-                                } else {
-                                    console.log('No Instance ID token available.');
-                                    showEnableNotificationsPrompt()
-                                }
-                            }).catch((err) => {
-                                console.log('An error occurred while retrieving token. ', err);
-                                showEnableNotificationsPrompt();
-                            });
+    function markTokenSentIfApplicable() {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search);
+        if (params.has('fbt')) {
+            messaging.getToken()
+                    .then((token) => {
+                        if (token === params.get('fbt')) {
+                            console.log("Tokens match; saved");
+                            setTokenSentToServer(true);
+                            location.href = location.origin + location.pathname + "?beta";
                         } else {
-                            console.log('Unable to get permission to notify.');
+                            console.log("Tokens don't match");
                         }
+                    })
+                    .catch((err) => {
+                        console.log('Unable to retrieve token ', err);
                     });
         }
+    }
 
-        function turnOffNotifications() {
-            hideEnableNotificationsPrompt();
-            hideAlreadyEnabledNotificationsPrompt();
-            enableTwitterSignInLink(null, 'disable');
-        }
-
-        function enableTwitterSignInLink(fbtoken, action = null) {
-            if (fbtoken) {
-                document.querySelector('#twittersignin a').href += `&fbtoken=${fbtoken}`;
+    function initializeNotificationsUI() {
+        messaging.getToken().then((currentToken) => {
+            console.log({currentToken});
+            if (currentToken && window.existingFbToken && window.existingFbToken === currentToken) {
+                // Notifications are enabled for this device
+                hideEnableNotificationsPrompt();
+                showAlreadyEnabledNotificationsPrompt();
+            } else {
+                console.log('No Instance ID token available.');
+                showEnableNotificationsPrompt()
             }
-            if (action) {
-                document.querySelector('#twittersignin a').href += `&action=${action}`;
-            }
-            document.querySelector('#twittersignin').style.display = 'block';
-        }
-    </script>
+        }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+            showEnableNotificationsPrompt();
+        });
+    }
 
-    <script>
-        function enableBetaIfRequested() {
-            const url = new URL(window.location);
-            const params = new URLSearchParams(url.search);
-            if (params.has('beta') || params.has('fbt')) {
-                window.inBeta = true;
-                console.log("Enabled beta");
-                initializeAndConfigurePushNotifications();
-            }
-        }
+    function hideEnableNotificationsPrompt() {
+        document.getElementById('permission_div').style.display = "none";
+    }
 
-        enableBetaIfRequested();
-    </script>
+    function showEnableNotificationsPrompt() {
+        document.getElementById('permission_div').style.display = "block";
+        document.querySelector('#permission_div button').disabled = false;
+        document.querySelector('#permission_div button').textContent = "Enable notifications";
+        setTokenSentToServer(false);
+    }
+
+    function showAlreadyEnabledNotificationsPrompt() {
+        document.getElementById('enabled_div').style.display = "block";
+    }
+
+    function hideAlreadyEnabledNotificationsPrompt() {
+        document.getElementById('enabled_div').style.display = "none";
+    }
+
+    function setTokenSentToServer(sent) {
+        window.localStorage.setItem('sentToServer', sent ? '1' : '0');
+    }
+
+    function isTokenSentToServer() {
+        return window.localStorage.getItem('sentToServer') == '1';
+    }
+
+    function requestPermission() {
+        Notification.requestPermission()
+                .then((permission) => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        document.querySelector('#permission_div button').disabled = true;
+                        document.querySelector('#permission_div button').textContent = "Loading...";
+                        messaging.getToken().then((currentToken) => {
+                            console.log({currentToken});
+                            if (currentToken) {
+                                hideEnableNotificationsPrompt();
+                                enableTwitterSignInLink(currentToken);
+                            } else {
+                                console.log('No Instance ID token available.');
+                                showEnableNotificationsPrompt()
+                            }
+                        }).catch((err) => {
+                            console.log('An error occurred while retrieving token. ', err);
+                            showEnableNotificationsPrompt();
+                        });
+                    } else {
+                        console.log('Unable to get permission to notify.');
+                    }
+                });
+    }
+
+    function turnOffNotifications() {
+        hideEnableNotificationsPrompt();
+        hideAlreadyEnabledNotificationsPrompt();
+        enableTwitterSignInLink(null, 'disable');
+    }
+
+    function enableTwitterSignInLink(fbtoken, action = null) {
+        if (fbtoken) {
+            document.querySelector('#twittersignin a').href += `&fbtoken=${fbtoken}`;
+        }
+        if (action) {
+            document.querySelector('#twittersignin a').href += `&action=${action}`;
+        }
+        document.querySelector('#twittersignin').style.display = 'block';
+    }
+</script>
+
+<script>
+    function enableBetaIfRequested() {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search);
+        if (params.has('beta') || params.has('fbt')) {
+            window.inBeta = true;
+            console.log("Enabled beta");
+            initializeAndConfigurePushNotifications();
+        }
+    }
+
+    enableBetaIfRequested();
+</script>
 </body>

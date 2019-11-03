@@ -230,9 +230,8 @@
     }
 
     function enableTwitterSignInLink(fbtoken) {
-        const signInLink = document.querySelector('#twittersignin a');
-        signInLink.href += fbtoken;
-        signInLink.style.display = 'block';
+        document.querySelector('#twittersignin a').href += fbtoken;
+        document.querySelector('#twittersignin').style.display = 'block';
     }
 </script>
 

@@ -91,6 +91,18 @@ functions:
           path: /_/starttwittersignin
           method: get
 
+  completeTwitterSignIn:
+    handler: handler.completeTwitterSignIn
+    events:
+      - http:
+          path: /_/completetwittersignin
+          method: get
+          request:
+            parameters:
+              querystrings:
+                username: true
+                action: false
+                fbtoken: false
 
   getDownloadsOrStaticFiles:
     handler: handler.getDownloadsOrStaticFiles

@@ -133,11 +133,14 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     console.log(typeof event);
     // For some reason, sometimes the event data comes in as a string.
     // I think there's a bug with the Lambda proxy integration.
+    let queryParams;
     if (typeof event === "string") {
-        const newevent = JSON.parse(event);
-        console.log({ newevent });
+        const newEvent = JSON.parse(event);
+        console.log({ newEvent });
+        queryParams = newEvent.queryStringParameters;
+    } else {
+        queryParams = event.queryStringParameters;
     }
-    const queryParams = event.queryStringParameters;
     if (!queryParams) {
         throw new Error('No query params');
     }

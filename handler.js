@@ -93,10 +93,11 @@ module.exports.getHomePage = async (event, context) => {
 };
 
 module.exports.startTwitterSignIn = async (event, context) => {
-    if (!event.queryStringParameters) {
+    console.log({ event });
+    const queryParams = event.queryStringParameters;
+    if (!queryParams) {
         throw new Error('No query params');
     }
-    const queryParams = event.queryStringParameters;
     if (queryParams.action) {
         if (queryParams.action !== "disable") {
             throw new Error('Unknown value of action in query params');
@@ -124,11 +125,12 @@ module.exports.startTwitterSignIn = async (event, context) => {
 };
 
 module.exports.completeTwitterSignIn = async (event, context) => {
-    console.log(event);
-    if (!event.queryStringParameters) {
+    console.log(typeof event);
+    console.log({ event });
+    const queryParams = event.queryStringParameters;
+    if (!queryParams) {
         throw new Error('No query params');
     }
-    const queryParams = event.queryStringParameters;
     if (queryParams.action) {
         if (queryParams.action !== "disable") {
             throw new Error('Unknown value of action in query params');

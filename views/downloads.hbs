@@ -92,6 +92,12 @@
 <script>
     function initializeAndConfigurePushNotifications() {
         if (!window.inBeta) {
+            console.log("Not in beta.");
+            return;
+        }
+
+        if (! ("serviceWorker" in navigator)) {
+            console.log("Service workers not supported.");
             return;
         }
 

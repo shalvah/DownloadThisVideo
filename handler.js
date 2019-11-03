@@ -93,19 +93,25 @@ module.exports.getHomePage = async (event, context) => {
 };
 
 module.exports.startTwitterSignIn = async (event, context) => {
-    if (!(event.queryStringParameters
-        && event.queryStringParameters.username
-        && event.queryStringParameters.fbtoken)) {
+    if (!event.queryStringParameters) {
+        throw new Error('No query params');
+    }
+    const queryParams = event.queryStringParameters;
+    if (queryParams.action) {
+        if (!(queryParams.action !== "disable")) {
+            throw new Error('Unknown value of action in query params');
+        }
+    } else if (!(queryParams.username && queryParams.fbtoken)) {
         throw new Error('Missing fbtoken or username in query params');
     }
 
-    const token = event.queryStringParameters.fbtoken;
-    const username = event.queryStringParameters.username;
-
-    const {oauth_token: requestToken, oauth_token_secret, oauth_callback_confirmed } = await twitter.getRequestToken(
-        process.env.TWITTER_CALLBACK_URL + `?fbtoken=${token}&username=${username}`
-    );
-    if (!oauth_callback_confirmed ) {
+    let {username, fbtoken: token, action} = queryParams;
+    const callbackUrl = process.env.TWITTER_CALLBACK_URL
+        + `?username=${username}`
+        + (action ? `&action=${action}` : '')
+        + (token ? `&fbtoken=${token}` : '');
+    const {oauth_token: requestToken, oauth_token_secret, oauth_callback_confirmed} = await twitter.getRequestToken(callbackUrl);
+    if (!oauth_callback_confirmed) {
         throw new Error('OAuth callback not confirmed!');
     }
     const redirect = {
@@ -119,27 +125,44 @@ module.exports.startTwitterSignIn = async (event, context) => {
 
 module.exports.completeTwitterSignIn = async (event, context) => {
     console.log(event);
-    if (!(event.queryStringParameters && event.queryStringParameters.fbtoken)) {
-        throw new Error('Missing fbtoken in query params');
+    if (!event.queryStringParameters) {
+        throw new Error('No query params');
+    }
+    const queryParams = event.queryStringParameters;
+    if (queryParams.action) {
+        if (!(queryParams.action !== "disable")) {
+            throw new Error('Unknown value of action in query params');
+        }
+    } else if (!(queryParams.username && queryParams.fbtoken)) {
+        throw new Error('Missing fbtoken or username in query params');
     }
 
     const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
+    const action = event.queryStringParameters.action;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const {oauth_token} = twitter.getAccessToken(oauthVerifier);
     // We aren't really using the access token for anything;
     // we just needed a one-time Twitter authorization
-    const data = {
-        fbToken: fbToken,
-        notifications: true,
-    };
+
+    let data;
+    if (action === "disable") {
+        data = {
+            notifications: false,
+        };
+    } else {
+        data = {
+            fbToken,
+            notifications: true,
+        };
+    }
     console.log("Saving settings for " + username, JSON.stringify(data));
     await cache.setAsync(`settings-${username}`, JSON.stringify(data))
     const redirect = {
         statusCode: 302,
         headers: {
-            Location: `http://${process.env.EXTERNAL_URL}/${username}?fbt=${fbToken}`
+            Location: `http://${process.env.EXTERNAL_URL}/${username}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
         }
     };
     return redirect;

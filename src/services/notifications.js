@@ -30,5 +30,7 @@ module.exports = {
                     console.log('notification.send.error:' + JSON.stringify(error));
                 });
         }
+
+        return Promise.resolve();
     }
 };

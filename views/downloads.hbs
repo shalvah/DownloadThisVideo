@@ -50,13 +50,14 @@
 {{#if settings.notifications }}
         <h5>You've got push notifications for downloads enabled on another device. Would you like to switch to this one?</h5>
         <button onclick="requestPermission()">Switch notifications to this device</button>
+        <button onclick="turnOffNotifications()">Disable all notifications</button>
 {{else }}
         <h5>Psst! @this_vid can send you a push notification on your device for new downloads, if you like.</h5>
         <button onclick="requestPermission()">Enable notifications</button>
 {{/if}}
 </div>
     <div id="twittersignin" style="display: none;">
-        Last step! <a href="/_/starttwittersignin?username={{ username }}&fbtoken=">Sign in with Twitter</a> to authorize notifications
+        Last step! <a href="/_/starttwittersignin?username={{ username }}">Sign in with Twitter</a> to authorize this action.
     </div>
 </div>
 
@@ -239,8 +240,18 @@
                 });
     }
 
-    function enableTwitterSignInLink(fbtoken) {
-        document.querySelector('#twittersignin a').href += fbtoken;
+    function turnOffNotifications() {
+        hideEnableNotificationsPrompt();
+        enableTwitterSignInLink(null, 'disable');
+    }
+
+    function enableTwitterSignInLink(fbtoken, action = null) {
+        if (fbtoken) {
+            document.querySelector('#twittersignin a').href += `&fbtoken=${fbtoken}`;
+        }
+        if (action) {
+            document.querySelector('#twittersignin a').href += `&action=${action}`;
+        }
         document.querySelector('#twittersignin').style.display = 'block';
     }
 </script>

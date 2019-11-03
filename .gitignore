@@ -8,3 +8,5 @@ jspm_packages
 .idea/
 
 .env
+
+**/*-serviceaccount.json

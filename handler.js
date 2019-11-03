@@ -72,9 +72,10 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case '':
             return finish().render('home', {link: getSponsoredLink()});
         default: {
-            const settings = JSON.parse(await cache.getAsync(`settings-${username}`)) || {};
-
-            let downloads = await ops.getUserDownloads(cache, username);
+            const getSettings = cache.getAsync(`settings-${username}`);
+            const getDownloads = ops.getUserDownloads(cache, username);
+            let [settings, downloads] = await Promise.all([getSettings, getDownloads]);
+            settings = JSON.parse(settings) || {};
             const prepareDownloadforFrontend = (d) => {
                 return JSON.parse(d, function convertTimeToRelative(key, value) {
                     return key === 'time' ? getRelativeTime(value) : value;
@@ -117,6 +118,7 @@ module.exports.startTwitterSignIn = async (event, context) => {
 };
 
 module.exports.completeTwitterSignIn = async (event, context) => {
+    console.log(event);
     if (!(event.queryStringParameters && event.queryStringParameters.fbtoken)) {
         throw new Error('Missing fbtoken in query params');
     }

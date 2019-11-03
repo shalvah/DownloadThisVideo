@@ -37,6 +37,7 @@ provider:
     REDIS_PASSWORD: ${env:REDIS_PASSWORD}
     TWITTER_SCREEN_NAME: ${env:TWITTER_SCREEN_NAME}
     EXTERNAL_URL: ${env:EXTERNAL_URL}
+    FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
     TOPIC_ARN:
       "Fn::Join":
       - ':'
@@ -56,6 +57,8 @@ package:
   - .idea/**
   - .git/**
   - this-vid.png
+  - awscli-bundle.zip
+  - awscli-bundle/**
 
 functions:
   fetchTweetsToDownload:

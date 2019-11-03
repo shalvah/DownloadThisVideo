@@ -2,6 +2,7 @@
 
 const { get, findItemWithGreatest, SUCCESS, FAIL, UNCERTAIN } = require('../utils');
 const { ExternalPublisherError, NoVideoInTweet } = require('../errors');
+const { sendNotification } = require('../services/notifications');
 
 const isTweetAReply = (tweet) => !!tweet.in_reply_to_status_id_str;
 
@@ -92,6 +93,7 @@ const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
         cache.setAsync(`tweet-${tweet.referencing_tweet}`, link, 'EX', 7 * 24 * 60 * 60),
         updateUserDownloads(tweet, link, cache),
         twitter.replyWithRedirect(tweet),
+        sendNotification(tweet.author.toLowerCase(), cache),
     ]).then(() => SUCCESS);
 };
 

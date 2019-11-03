@@ -3,7 +3,7 @@ node_js:
 - "10.13"
 
 env:
-- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space TWITTER_CALLBACK_URL="https://thisvid.space/_/completetwittersignin"
+- SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space FIREBASE_PROJECT_ID=downloadthisvideo-662ae TWITTER_CALLBACK_URL="https://thisvid.space/_/completetwittersignin"
 
 cache:
   directories:
@@ -12,18 +12,28 @@ cache:
 install: npm i && npm i -g serverless
 
 stages:
-- name: test
-- name: lint
+- name: predeploy
 - name: deploy
   if: branch = master
 
 jobs:
   include:
   - stage: deploy
-    script: sls deploy
+    before_script:
+      - curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+      - unzip awscli-bundle.zip
+      - ./awscli-bundle/install -b ~/bin/aws
+      - export PATH=~/bin:$PATH
+    script: |
+      aws --region us-east-1 s3 cp \
+      s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
+      ./downloadthisvideo-serviceaccount.json && \
+      sls deploy
 
-  - stage: test
+  - stage: predeploy
+    name: Test
     script: npm run test
 
-  - stage: lint
+  - stage: predeploy
+    name: Lint
     script: npm run lint

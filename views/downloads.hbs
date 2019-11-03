@@ -47,13 +47,12 @@
     {{/each}}
 
     <div id="permission_div" style="display: none;">
-        <h4>Needs Permission</h4>
+        <h5>Psst! @this_vid can send you a push notification on your device for new downloads</h5>
         <p id="token"></p>
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"
-                onclick="requestPermission()">Request Permission</button>
+        <button onclick="requestPermission()">Enable notifications</button>
     </div>
-    <div>
-        <a id="twittersignin" style="display: none;" href="/_/starttwittersignin?username={{ username }}&fbtoken=">Sign in with Twitter to authorize notifications</a>
+    <div id="twittersignin" style="display: none;">
+        Last step! <a href="/_/starttwittersignin?username={{ username }}&fbtoken=">Sign in with Twitter</a> to authorize notifications
     </div>
 </div>
 
@@ -117,7 +116,7 @@
 
         navigator.serviceWorker.register('/firebase-messaging-sw.js')
                 .then(reg => console.log('Registered SW successfully', reg))
-                .then(err => console.log('Failed to register SW', err))
+                .catch(err => console.log('Failed to register SW', err))
     }
 
     function setTokenRefreshHandler() {

@@ -190,6 +190,8 @@
 
     function showEnableNotificationsPrompt() {
         document.getElementById('permission_div').style.display = "block";
+        document.querySelector('#permission_div button').disabled = false;
+        document.querySelector('#permission_div button').textContent = "Enable notifications";
         setTokenSentToServer(false);
     }
 

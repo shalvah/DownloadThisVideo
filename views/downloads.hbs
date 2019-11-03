@@ -114,6 +114,10 @@
         firebase.initializeApp(firebaseConfig);
         window.messaging = firebase.messaging();
         messaging.usePublicVapidKey("BPWZObbrWgRIOpHwSfJBAHh2GLMFcTFX2tYzrBPE5-_yGTeg_EY7bo5naJ2zFLoAZW1Vf5U3wcZUraZLxHA6rWU");
+
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then(reg => console.log('Registered SW successfully', reg))
+                .then(err => console.log('Failed to register SW', err))
     }
 
     function setTokenRefreshHandler() {
@@ -131,15 +135,13 @@
     }
 
     function setNewMessageHandler() {
-        messaging.onMessage((data) => {
-            console.log('Message received. ', data);
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
             if (Notification.permission == 'granted') {
-                const notification = new Notification(data.data.title, {body: "Your video's ready!🎉", data: { username: data.data.username}});
-                notification.onclick = (event) => {
-                    event.preventDefault();
-                    location.href = 'https://thisvid.space/' + notification.data.username;
-                    notification.close();
-                }
+                navigator.serviceWorker.getRegistration().then((reg) => {
+                    reg.showNotification(payload.data.title,
+                            {body: "Your video's ready!🎉", data: { username: payload.data.username}});
+                });
             } else {
                 console.log("No notification permission")
             }

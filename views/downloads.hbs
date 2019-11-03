@@ -206,6 +206,8 @@
                 .then((permission) => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted.');
+                        document.querySelector('#permission_div button').disabled = true;
+                        document.querySelector('#permission_div button').textContent = "Loading...";
                         messaging.getToken().then((currentToken) => {
                             console.log({ currentToken });
                             if (currentToken) {
@@ -226,7 +228,7 @@
     }
 
     function enableTwitterSignInLink(fbtoken) {
-        const signInLink = document.querySelector('#twittersignin');
+        const signInLink = document.querySelector('#twittersignin a');
         signInLink.href += fbtoken;
         signInLink.style.display = 'block';
     }

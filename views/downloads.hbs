@@ -134,7 +134,7 @@
         messaging.onMessage((data) => {
             console.log('Message received. ', data);
             if (Notification.permission == 'granted') {
-                const notification = new Notification(data.title, {body: "Your video's ready!🎉", data: { username: data.username}});
+                const notification = new Notification(data.data.title, {body: "Your video's ready!🎉", data: { username: data.data.username}});
                 notification.onclick = (event) => {
                     event.preventDefault();
                     location.href = 'https://thisvid.space/' + notification.data.username;
@@ -156,6 +156,7 @@
                         if (token === params.get('fbt')) {
                             console.log("Tokens match; saved");
                             setTokenSentToServer(true);
+                            location.href = location.origin + location.pathname + "?beta";
                         } else {
                             console.log("Tokens don't match");
                         }

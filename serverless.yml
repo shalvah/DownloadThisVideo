@@ -59,6 +59,8 @@ package:
   - this-vid.png
   - awscli-bundle.zip
   - awscli-bundle/**
+  - spec/**
+  - assets/*.png
 
 functions:
   fetchTweetsToDownload:

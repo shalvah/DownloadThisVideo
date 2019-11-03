@@ -135,7 +135,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     // I think there's a bug with the Lambda proxy integration.
     let queryParams;
     if (typeof event === "string") {
-        const newEvent = JSON.parse(event);
+        const newEvent = JSON.parse(JSON.parse(event));
         console.log({ newEvent });
         queryParams = newEvent.queryStringParameters;
     } else {

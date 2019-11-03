@@ -94,6 +94,11 @@ module.exports.getHomePage = async (event, context) => {
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({ event });
+    // For some reason, sometimes the event data comes in as a string.
+    // I think there's a bug with the Lambda proxy integration.
+    if (typeof event === "string") {
+        event = JSON.parse(event);
+    }
     const queryParams = event.queryStringParameters;
     if (!queryParams) {
         throw new Error('No query params');
@@ -127,6 +132,11 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     console.log(typeof event);
     console.log({ event });
+    // For some reason, sometimes the event data comes in as a string.
+    // I think there's a bug with the Lambda proxy integration.
+    if (typeof event === "string") {
+        event = JSON.parse(event);
+    }
     const queryParams = event.queryStringParameters;
     if (!queryParams) {
         throw new Error('No query params');

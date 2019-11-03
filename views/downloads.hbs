@@ -49,23 +49,24 @@
 
     <div id="permission_div" style="display: none;">
         {{#if settings.notifications }}
-            <h5>You've got push notifications for downloads enabled on another device. You can switch to this one, or
-                turn off notifications entirely.</h5>
+            <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
+                turn off notifications entirely.</small><br>
             <button onclick="requestPermission()">Switch notifications to this device</button>
             <button onclick="turnOffNotifications()">Disable all notifications</button>
         {{else }}
-            <h5>Psst! @this_vid can send you a push notification on your device for new downloads, if you like.</h5>
+            <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you like.</small><br>
             <button onclick="requestPermission()">Enable notifications</button>
         {{/if}}
+    </div>
 
-        <div id="enabled_div" style="display: none;">
-            <h5>You've got push notifications for downloads enabled on this device. </h5>
-            <button onclick="turnOffNotifications()">Disable all notifications</button>
-        </div>
-        <div id="twittersignin" style="display: none;">
-            Last step! <a href="/_/starttwittersignin?username={{ username }}">Sign in with Twitter</a> to authorize
-            this action.
-        </div>
+    <div id="enabled_div" style="display: none;">
+        <small>You've got push notifications for downloads enabled on this device. </small><br>
+        <button onclick="turnOffNotifications()">Disable all notifications</button>
+    </div>
+
+    <div id="twittersignin" style="display: none;">
+        Last step! <a href="/_/starttwittersignin?username={{ username }}">Sign in with Twitter</a> to authorize
+        this action.
     </div>
 
     <footer style="margin-bottom: 0; padding-bottom: 0">

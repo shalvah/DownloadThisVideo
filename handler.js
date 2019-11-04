@@ -131,7 +131,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
 
     const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
-    const action = event.queryStringParsameters.action;
+    const action = event.queryStringParameters.action;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const {oauth_token} = await twitter.getAccessToken(oauthVerifier);

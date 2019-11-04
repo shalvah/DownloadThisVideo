@@ -131,10 +131,10 @@ module.exports.completeTwitterSignIn = async (event, context) => {
 
     const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
-    const action = event.queryStringParameters.action;
+    const action = event.queryStringParsameters.action;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
-    const {oauth_token} = twitter.getAccessToken(oauthVerifier);
+    const {oauth_token} = await twitter.getAccessToken(oauthVerifier);
     // We aren't really using the access token for anything;
     // we just needed a one-time Twitter authorization
 
@@ -150,7 +150,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         };
     }
     console.log("Saving settings for " + username, JSON.stringify(data));
-    await cache.setAsync(`settings-${username}`, JSON.stringify(data))
+    await cache.setAsync(`settings-${username}`, JSON.stringify(data));
     const redirect = {
         statusCode: 302,
         headers: {

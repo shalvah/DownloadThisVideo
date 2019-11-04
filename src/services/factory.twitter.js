@@ -123,7 +123,7 @@ module.exports = (cache) => {
         const originalJsonParse = JSON.parse.bind(JSON);
         JSON.parse = function (value) {
             try {
-                return JSON.parse(value);
+                return originalJsonParse(value);
             } catch (e) {
                 return value;
             }
@@ -168,7 +168,7 @@ module.exports = (cache) => {
             .then(r => {
             JSON.parse = originalJsonParse;
             try {
-                const data = JSON.parse(r.data);
+                const data = originalJsonParse(r.data);
                 if (data.errors) {
                     return Promise.reject(data);
                 }

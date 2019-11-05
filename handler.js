@@ -63,14 +63,6 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
-        case 'faq': {
-            const faqs = require('./faqs');
-            return finish().render('faq', {faqs, link: getSponsoredLink()});
-        }
-        case null:
-        case undefined:
-        case '':
-            return finish().render('home', {link: getSponsoredLink()});
         default: {
             const getSettings = cache.getAsync(`settings-${username}`);
             const getDownloads = ops.getUserDownloads(cache, username);
@@ -84,6 +76,17 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             downloads = downloads.map(prepareDownloadforFrontend);
 
             return finish().render('downloads', {username, downloads, settings, link: getSponsoredLink()});
+        }
+    }
+};
+
+module.exports.page = async (event, context) => {
+    let page = event.pathParameters.page;
+    switch (page) {
+        case 'faqs':
+        case 'faq': {
+            const faqs = require('./faqs');
+            return finish().render('faq', {faqs, link: getSponsoredLink()});
         }
     }
 };

@@ -104,6 +104,17 @@ functions:
                 action: false
                 fbtoken: false
 
+  page:
+    handler: handler.page
+    events:
+      - http:
+          path: /p/{page}
+          method: get
+          request:
+            parameters:
+              paths:
+                page: true
+
   getDownloadsOrStaticFiles:
     handler: handler.getDownloadsOrStaticFiles
     events:

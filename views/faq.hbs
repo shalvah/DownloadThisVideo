@@ -32,7 +32,7 @@
 <div class="content">
 <h2>Frequently Asked Questions</h2>
 {{#each faqs }}
-    <b>{{ this.question }}</b>
+    <b id="{{ this.id }}">{{ this.question }}</b>
     <div>{{{ this.answer }}}</div>
     <br>
 {{/each}}

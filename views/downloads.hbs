@@ -54,20 +54,23 @@
             <button onclick="requestPermission()">Switch notifications to this device</button>
             <button onclick="turnOffNotifications()">Disable all notifications</button>
         {{else }}
-            Psst! @this_vid can send you a push notification on your device* for new downloads, if you'd like.💃 <a href="/i/faq/#notifications">Details</a>.<br>
-            <small>*Not available on iOS and Safari for MacOS</small><br>
+            <small>Psst! @this_vid can send you a push notification on your device* for new downloads, if you'd like.💃 <a href="/p/faq/#notifications">See the FAQ for details.</a></small>
+            <br>
             <button onclick="requestPermission()">Enable notifications</button>
         {{/if}}
+        <br>
     </div>
 
     <div id="enabled_div" style="display: none;">
         <small>You've got push notifications for downloads enabled on this device. </small><br>
         <button onclick="turnOffNotifications()">Disable all notifications</button>
+        <br>
     </div>
 
     <div id="twittersignin" style="display: none;">
         Last step! <a href="/_/starttwittersignin?username={{ username }}">Sign in with Twitter</a> to authorize
         this action.
+        <br>
     </div>
 </div>
 <footer style="margin-bottom: 0; padding-bottom: 0">
@@ -108,6 +111,18 @@
 
         if (!("serviceWorker" in navigator)) {
             console.log("Service workers not supported.");
+            return;
+        }
+
+        const os = getOS();
+        if ([OSes.iOS, OSes.unknown].includes(os)) {
+            console.log("Not supported on " + os);
+            return;
+        }
+
+        const browser = getBrowser();
+        if ([browsers.safari, browsers.IE, browsers.unknown].includes(browser)) {
+            console.log("Not supported on " + browser);
             return;
         }
 
@@ -287,5 +302,67 @@
     }
 
     enableBetaIfRequested();
+</script>
+
+<script>
+    var OSes = {
+        macOS: 'macOS',
+        windows: "Windows",
+        linux: "Linux",
+        android: "Android",
+        iOS: "iOS",
+        unknown: null,
+    };
+
+    function getOS() {
+        const userAgent = window.navigator.userAgent;
+        const platform = window.navigator.platform;
+        const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+        const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+        const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+        let os = OSes.unknown;
+
+        if (macosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.macOS;
+        } else if (iosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.iOS;
+        } else if (windowsPlatforms.indexOf(platform) !== -1) {
+            os = OSes.windows;
+        } else if (/Android/.test(userAgent)) {
+            os = OSes.android;
+        } else if (/Linux/.test(platform)) {
+            os = OSes.linux;
+        }
+
+        return os;
+    }
+
+    var browsers = {
+        opera: "Opera",
+        IE: "IE",
+        chrome: "Chrome",
+        safari: "Safari",
+        firefox: "Firefox",
+        unknown: null,
+    };
+
+    function getBrowser() {
+        var userAgent = navigator.userAgent;
+        var browserName = browsers.unknown;
+
+        if (userAgent.includes("Opera")) {
+            browserName = browsers.opera;
+        } else if (userAgent.includes("MSIE")) {
+            browserName = browsers.IE;
+        } else if (userAgent.includes("Chrome")) {
+            browserName = browsers.chrome;
+        } else if (userAgent.includes("Safari")) {
+            browserName = browsers.safari;
+        } else if (userAgent.includes("Firefox")) {
+            browserName = browsers.firefox;
+        }
+
+        return browserName;
+    }
 </script>
 </body>

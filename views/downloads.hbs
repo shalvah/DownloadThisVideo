@@ -98,6 +98,68 @@
 <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-messaging.js"></script>
 
 <script>
+    const OSes = {
+        macOS: 'macOS',
+        windows: "Windows",
+        linux: "Linux",
+        android: "Android",
+        iOS: "iOS",
+        unknown: null,
+    };
+
+    function getOS() {
+        const userAgent = window.navigator.userAgent;
+        const platform = window.navigator.platform;
+        const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+        const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+        const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+        let os = OSes.unknown;
+
+        if (macosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.macOS;
+        } else if (iosPlatforms.indexOf(platform) !== -1) {
+            os = OSes.iOS;
+        } else if (windowsPlatforms.indexOf(platform) !== -1) {
+            os = OSes.windows;
+        } else if (/Android/.test(userAgent)) {
+            os = OSes.android;
+        } else if (/Linux/.test(platform)) {
+            os = OSes.linux;
+        }
+
+        return os;
+    }
+
+    const browsers = {
+        opera: "Opera",
+        IE: "IE",
+        chrome: "Chrome",
+        safari: "Safari",
+        firefox: "Firefox",
+        unknown: null,
+    };
+
+    function getBrowser() {
+        var userAgent = navigator.userAgent;
+        var browserName = browsers.unknown;
+
+        if (userAgent.includes("Opera")) {
+            browserName = browsers.opera;
+        } else if (userAgent.includes("MSIE")) {
+            browserName = browsers.IE;
+        } else if (userAgent.includes("Chrome")) {
+            browserName = browsers.chrome;
+        } else if (userAgent.includes("Safari")) {
+            browserName = browsers.safari;
+        } else if (userAgent.includes("Firefox")) {
+            browserName = browsers.firefox;
+        }
+
+        return browserName;
+    }
+</script>
+
+<script>
         {{#if settings.fbToken }}
         window.existingFbToken = "{{ settings.fbToken }}";
         {{/if}}
@@ -302,67 +364,5 @@
     }
 
     enableBetaIfRequested();
-</script>
-
-<script>
-    var OSes = {
-        macOS: 'macOS',
-        windows: "Windows",
-        linux: "Linux",
-        android: "Android",
-        iOS: "iOS",
-        unknown: null,
-    };
-
-    function getOS() {
-        const userAgent = window.navigator.userAgent;
-        const platform = window.navigator.platform;
-        const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-        const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-        const iosPlatforms = ['iPhone', 'iPad', 'iPod'];
-        let os = OSes.unknown;
-
-        if (macosPlatforms.indexOf(platform) !== -1) {
-            os = OSes.macOS;
-        } else if (iosPlatforms.indexOf(platform) !== -1) {
-            os = OSes.iOS;
-        } else if (windowsPlatforms.indexOf(platform) !== -1) {
-            os = OSes.windows;
-        } else if (/Android/.test(userAgent)) {
-            os = OSes.android;
-        } else if (/Linux/.test(platform)) {
-            os = OSes.linux;
-        }
-
-        return os;
-    }
-
-    var browsers = {
-        opera: "Opera",
-        IE: "IE",
-        chrome: "Chrome",
-        safari: "Safari",
-        firefox: "Firefox",
-        unknown: null,
-    };
-
-    function getBrowser() {
-        var userAgent = navigator.userAgent;
-        var browserName = browsers.unknown;
-
-        if (userAgent.includes("Opera")) {
-            browserName = browsers.opera;
-        } else if (userAgent.includes("MSIE")) {
-            browserName = browsers.IE;
-        } else if (userAgent.includes("Chrome")) {
-            browserName = browsers.chrome;
-        } else if (userAgent.includes("Safari")) {
-            browserName = browsers.safari;
-        } else if (userAgent.includes("Firefox")) {
-            browserName = browsers.firefox;
-        }
-
-        return browserName;
-    }
 </script>
 </body>

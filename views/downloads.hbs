@@ -50,7 +50,7 @@
     <div id="switch_prompt" style="display: none;">
         <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
             turn off notifications entirely.</small><br>
-        <button onclick="requestPermission">Switch notifications to this device</button>
+        <button onclick="requestPermission(this)">Switch notifications to this device</button>
         <button onclick="turnOffNotifications()">Disable all notifications</button>
         <br>
     </div>
@@ -60,7 +60,7 @@
             <a
                     href="/p/faq/#notifications">See the FAQ for details.</a></small>
         <br>
-        <button onclick="requestPermission">Enable notifications</button>
+        <button onclick="requestPermission(this)">Enable notifications</button>
         <br>
     </div>
 
@@ -341,14 +341,13 @@
         return window.localStorage.getItem('sentToServer') == '1';
     }
 
-    function requestPermission(event) {
-        event.preventDefault();
+    function requestPermission(button) {
         Notification.requestPermission()
                 .then((permission) => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted.');
-                        event.target.disabled = true;
-                        event.target.textContent = "Loading...";
+                        button.disabled = true;
+                        button.textContent = "Loading...";
 
                         messaging.getToken().then((currentToken) => {
                             console.log({currentToken});

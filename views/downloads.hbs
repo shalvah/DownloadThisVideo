@@ -175,10 +175,6 @@
 
 <script>
     function initializeAndConfigurePushNotifications() {
-        if (!window.inBeta) {
-            console.log("Not in beta.");
-            return;
-        }
 
         if (!("serviceWorker" in navigator)) {
             console.log("Service workers not supported.");
@@ -262,7 +258,7 @@
                         if (token === params.get('fbt')) {
                             console.log("Tokens match; saved");
                             setTokenSentToServer(true);
-                            location.href = location.origin + location.pathname + "?beta";
+                            location.href = location.origin + location.pathname;
                         } else {
                             console.log("Tokens don't match");
                         }
@@ -390,16 +386,6 @@
 </script>
 
 <script>
-    function enableBetaIfRequested() {
-        const url = new URL(window.location);
-        const params = new URLSearchParams(url.search);
-        if (params.has('beta') || params.has('fbt')) {
-            window.inBeta = true;
-            console.log("Enabled beta");
-            initializeAndConfigurePushNotifications();
-        }
-    }
-
-    enableBetaIfRequested();
+    initializeAndConfigurePushNotifications();
 </script>
 </body>

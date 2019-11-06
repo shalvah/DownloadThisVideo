@@ -47,21 +47,24 @@
         <br>
     {{/each}}
 
-    <div id="permission_div" style="display: none;">
-        {{#if settings.notifications }}
-            <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
-                turn off notifications entirely.</small><br>
-            <button onclick="requestPermission()">Switch notifications to this device</button>
-            <button onclick="turnOffNotifications()">Disable all notifications</button>
-        {{else }}
-            <small>Psst! @this_vid can send you a push notification on your device* for new downloads, if you'd like.💃 <a href="/p/faq/#notifications">See the FAQ for details.</a></small>
-            <br>
-            <button onclick="requestPermission()">Enable notifications</button>
-        {{/if}}
+    <div id="switch_prompt" style="display: none;">
+        <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
+            turn off notifications entirely.</small><br>
+        <button onclick="requestPermission">Switch notifications to this device</button>
+        <button onclick="turnOffNotifications()">Disable all notifications</button>
         <br>
     </div>
 
-    <div id="enabled_div" style="display: none;">
+    <div id="enable_prompt" style="display: none;">
+        <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you'd like.💃
+            <a
+                    href="/p/faq/#notifications">See the FAQ for details.</a></small>
+        <br>
+        <button onclick="requestPermission">Enable notifications</button>
+        <br>
+    </div>
+
+    <div id="disable_prompt" style="display: none;">
         <small>You've got push notifications for downloads enabled on this device. </small><br>
         <button onclick="turnOffNotifications()">Disable all notifications</button>
         <br>
@@ -73,6 +76,7 @@
         <br>
     </div>
 </div>
+<br>
 <footer style="margin-bottom: 0; padding-bottom: 0">
     <div>
         <small>
@@ -163,7 +167,12 @@
         {{#if settings.fbToken }}
         window.existingFbToken = "{{ settings.fbToken }}";
         {{/if}}
+
+        {{#if settings.notifications }}
+        window.hasNotificationsEnabled = true;
+        {{/if}}
 </script>
+
 <script>
     function initializeAndConfigurePushNotifications() {
         if (!window.inBeta) {
@@ -244,7 +253,6 @@
         });
     }
 
-
     function markTokenSentIfApplicable() {
         const url = new URL(window.location);
         const params = new URLSearchParams(url.search);
@@ -268,37 +276,61 @@
     function initializeNotificationsUI() {
         messaging.getToken().then((currentToken) => {
             console.log({currentToken});
-            if (currentToken && window.existingFbToken && window.existingFbToken === currentToken) {
-                // Notifications are enabled for this device
-                hideEnableNotificationsPrompt();
-                showAlreadyEnabledNotificationsPrompt();
+            if (currentToken) {
+                if (window.hasNotificationsEnabled) {
+                    const hasNotificationsOnThisDevice = window.existingFbToken && window.existingFbToken === currentToken;
+                    if (hasNotificationsOnThisDevice) {
+                        // Notifications are enabled for this device
+                        showDisableNotificationsPrompt();
+                    } else {
+                        // They're on a different device
+                        showSwitchNotificationsPrompt();
+                    }
+                } else {
+                    // Doesn't have any notifications enabled
+                    showEnableNotificationsPrompt();
+                }
             } else {
                 console.log('No Instance ID token available.');
-                showEnableNotificationsPrompt()
+                showEnableNotificationsPrompt();
             }
         }).catch((err) => {
             console.log('An error occurred while retrieving token. ', err);
-            showEnableNotificationsPrompt();
+            // Abort
+            hideEnableNotificationsPrompt();
+            hideSwitchNotificationsPrompt();
+            hideDisableNotificationsPrompt();
         });
     }
 
     function hideEnableNotificationsPrompt() {
-        document.getElementById('permission_div').style.display = "none";
+        document.getElementById('enable_prompt').style.display = "none";
+    }
+
+    function hideSwitchNotificationsPrompt() {
+        document.getElementById('switch_prompt').style.display = "none";
+    }
+
+    function hideDisableNotificationsPrompt() {
+        document.getElementById('disable_prompt').style.display = "none";
     }
 
     function showEnableNotificationsPrompt() {
-        document.getElementById('permission_div').style.display = "block";
-        document.querySelector('#permission_div button').disabled = false;
-        document.querySelector('#permission_div button').textContent = "Enable notifications";
+        document.getElementById('enable_prompt').style.display = "block";
+        document.querySelector('#enable_prompt button').disabled = false;
+        document.querySelector('#enable_prompt button').textContent = "Enable notifications";
         setTokenSentToServer(false);
     }
 
-    function showAlreadyEnabledNotificationsPrompt() {
-        document.getElementById('enabled_div').style.display = "block";
+    function showSwitchNotificationsPrompt() {
+        document.getElementById('switch_prompt').style.display = "block";
+        document.querySelector('#switch_prompt button').textContent = "Switch notifications to this device";
+        setTokenSentToServer(false);
     }
 
-    function hideAlreadyEnabledNotificationsPrompt() {
-        document.getElementById('enabled_div').style.display = "none";
+    function showDisableNotificationsPrompt() {
+        document.getElementById('disable_prompt').style.display = "block";
+        setTokenSentToServer(true);
     }
 
     function setTokenSentToServer(sent) {
@@ -309,25 +341,31 @@
         return window.localStorage.getItem('sentToServer') == '1';
     }
 
-    function requestPermission() {
+    function requestPermission(event) {
+        event.preventDefault();
         Notification.requestPermission()
                 .then((permission) => {
                     if (permission === 'granted') {
                         console.log('Notification permission granted.');
-                        document.querySelector('#permission_div button').disabled = true;
-                        document.querySelector('#permission_div button').textContent = "Loading...";
+                        event.target.disabled = true;
+                        event.target.textContent = "Loading...";
+
                         messaging.getToken().then((currentToken) => {
                             console.log({currentToken});
                             if (currentToken) {
                                 hideEnableNotificationsPrompt();
+                                hideSwitchNotificationsPrompt();
                                 enableTwitterSignInLink(currentToken);
                             } else {
                                 console.log('No Instance ID token available.');
-                                showEnableNotificationsPrompt()
+                                // Failed, restore the button
+                                window.hasNotificationsEnabled
+                                        ? showSwitchNotificationsPrompt()
+                                        : showEnableNotificationsPrompt();
                             }
                         }).catch((err) => {
                             console.log('An error occurred while retrieving token. ', err);
-                            showEnableNotificationsPrompt();
+                            hideEnableNotificationsPrompt();
                         });
                     } else {
                         console.log('Unable to get permission to notify.');
@@ -336,8 +374,8 @@
     }
 
     function turnOffNotifications() {
-        hideEnableNotificationsPrompt();
-        hideAlreadyEnabledNotificationsPrompt();
+        hideDisableNotificationsPrompt();
+        hideSwitchNotificationsPrompt();
         enableTwitterSignInLink(null, 'disable');
     }
 

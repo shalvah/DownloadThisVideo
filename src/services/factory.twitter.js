@@ -155,7 +155,13 @@ module.exports = (cache) => {
         });
     };
 
-    const getAccessToken = (requestToken) => {
+    const getAccessToken = (requestToken, requestTokenSecret, verifier) => {
+        const t = new Twit({
+            consumer_key: process.env.TWITTER_CONSUMER_KEY,
+            consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+            access_token: requestToken,
+            access_token_secret: requestTokenSecret,
+        });
         const originalJsonParse = JSON.parse.bind(JSON);
         JSON.parse = function (value) {
             try {
@@ -164,7 +170,7 @@ module.exports = (cache) => {
                 return value;
             }
         }
-        return t.post(`https://api.twitter.com/oauth/access_token?oauth_verifier=${requestToken}`)
+        return t.post(`https://api.twitter.com/oauth/access_token?oauth_verifier=${verifier}`)
             .then(r => {
                 console.log(r.data);
             JSON.parse = originalJsonParse;

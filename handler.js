@@ -110,10 +110,11 @@ module.exports.startTwitterSignIn = async (event, context) => {
         + `?username=${username}`
         + (action ? `&action=${action}` : '')
         + (token ? `&fbtoken=${token}` : '');
-    const {oauth_token: requestToken, oauth_token_secret, oauth_callback_confirmed} = await twitter.getRequestToken(callbackUrl);
+    const {oauth_token: requestToken, oauth_token_secret: requestTokenSecret, oauth_callback_confirmed} = await twitter.getRequestToken(callbackUrl);
     if (!oauth_callback_confirmed) {
         throw new Error('OAuth callback not confirmed!');
     }
+    await cache.setAsync(`requestTokenSecret-${username}`, requestTokenSecret, 'EX', 5 * 60);
     const redirect = {
         statusCode: 302,
         headers: {
@@ -136,12 +137,15 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const username = event.queryStringParameters.username;
     const action = event.queryStringParameters.action;
     const oauthToken = event.queryStringParameters.oauth_token;
+    const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
-    const obj = await twitter.getAccessToken(oauthToken);
+    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
+    console.log({ requestTokenSecret });
+    const obj = await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
     console.log(obj);
     const {oauth_token, oauth_token_secret } = obj
     // We need to verify the user's identity, so we don't allow others to edit other folks' settings
-    // Since Twitter doesn't enfoce the screen_name parameter
+    // Since Twitter doesn't enforce the screen_name parameter
     const { screen_name } = await twitter.getUser(oauth_token, oauth_token_secret );
 
     if (screen_name !== username) {

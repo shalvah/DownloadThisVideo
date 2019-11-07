@@ -181,6 +181,15 @@ module.exports = (cache) => {
         });
     };
 
+    const getUser = (accessToken, accessTokenSecret) => {
+        const t = new Twit({
+            access_token: accessToken,
+            access_token_secret: accessTokenSecret,
+        });
+        return t.get(`account/verify_credentials`, {skip_status: 1})
+            .then(r => (console.log(r), r.data));
+    };
+
     return {
         getMentions,
         reply,
@@ -190,6 +199,7 @@ module.exports = (cache) => {
         fetchTweet,
         getRequestToken,
         getAccessToken,
+        getUser,
     };
 
 };

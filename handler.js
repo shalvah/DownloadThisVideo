@@ -137,9 +137,17 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const action = event.queryStringParameters.action;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
-    const {oauth_token} = await twitter.getAccessToken(oauthVerifier);
-    // We aren't really using the access token for anything;
-    // we just needed a one-time Twitter authorization
+    const {oauth_token, oauth_token_secret } = await twitter.getAccessToken(oauthVerifier);
+    // We need to verify the user's identity, so we don't allow others to edit other folks' settings
+    // Since Twitter doesn't enfoce the screen_name parameter
+    const { screen_name } = await twitter.getUser(oauth_token, oauth_token_secret );
+
+    if (screen_name !== username) {
+        return {
+            statusCode: 403,
+            body: "Unauthorized."
+        };
+    }
 
     let data;
     if (action === "disable") {

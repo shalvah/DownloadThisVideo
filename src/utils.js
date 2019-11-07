@@ -146,20 +146,12 @@ const getRelativeTime = (time) => {
 const getSponsoredLink = () => {
     const links = [
         {
-            text: "Your idea. Your brand. Your space. Get a .SPACE domain name for just $1 with the code GETMYSPACE on www.get.space.",
+            text: "Get a .SPACE domain name for just $1. Use the code GETMYSPACE on www.get.space.",
             url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner1"
-        },
-        {
-            text: ".SPACE domains: creative domains for creative souls. Use the code GETMYSPACE to get a domain for $1.",
-            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner2"
-        },
-        {
-            text: "Innovate. Disrupt.Repeat. Get a .SPACE domain for $1 with code GETMYSPACE.",
-            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner3"
         },
     ];
 
-    return links.random();
+    return links[0];
 };
 
 const SUCCESS = 'Success';

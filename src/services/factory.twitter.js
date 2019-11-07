@@ -1,7 +1,7 @@
 "use strict";
 
 const {
-    not ,
+    not,
     and,
     pluck,
     randomSuccessResponse,
@@ -11,7 +11,7 @@ const {
     isTweetAReplyToMe,
     isTweetAReply
 } = require('./tweet_operations');
-const { wrapTwitterErrors, errors } = require('twitter-error-handler');
+const {wrapTwitterErrors, errors} = require('twitter-error-handler');
 const aargh = require('aargh');
 const Twit = require('twit');
 
@@ -105,7 +105,7 @@ module.exports = (cache) => {
         }).then(() => myTweets);
     };
 
-    const shouldDownloadVid = async ({ id }) => {
+    const shouldDownloadVid = async ({id}) => {
         return not(haveIRepliedToTweetAlready)(id, await getMyTweets());
     };
 
@@ -179,21 +179,21 @@ module.exports = (cache) => {
         return t.post(`https://api.twitter.com/oauth/access_token`)
             .then(r => {
                 console.log(r.data);
-            JSON.parse = originalJsonParse;
+                JSON.parse = originalJsonParse;
                 request.post = originalRequestPost;
-            try {
-                const data = originalJsonParse(r.data);
-                if (data.errors) {
-                    return Promise.reject(data);
+                try {
+                    const data = originalJsonParse(r.data);
+                    if (data.errors) {
+                        return Promise.reject(data);
+                    }
+                } catch (e) {
+                    return require('querystring').decode(r.data);
                 }
-            } catch (e) {
-                return require('querystring').decode(r.data);
-            }
-        }).catch(e => {
-            JSON.parse = originalJsonParse;
+            }).catch(e => {
+                JSON.parse = originalJsonParse;
                 request.post = originalRequestPost;
-            throw e;
-        });
+                throw e;
+            });
     };
 
     const getUser = (accessToken, accessTokenSecret) => {

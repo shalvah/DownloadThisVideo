@@ -135,9 +135,9 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const fbToken = event.queryStringParameters.fbtoken;
     const username = event.queryStringParameters.username;
     const action = event.queryStringParameters.action;
-    const oauthVerifier = event.queryStringParameters.oauth_verifier;
+    const oauthToken = event.queryStringParameters.oauth_token;
 
-    const obj = await twitter.getAccessToken(oauthVerifier);
+    const obj = await twitter.getAccessToken(oauthToken);
     console.log(obj);
     const {oauth_token, oauth_token_secret } = obj
     // We need to verify the user's identity, so we don't allow others to edit other folks' settings

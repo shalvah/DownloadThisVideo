@@ -170,10 +170,17 @@ module.exports = (cache) => {
                 return value;
             }
         }
-        return t.post(`https://api.twitter.com/oauth/access_token?oauth_verifier=${verifier}`)
+        const request = require("request");
+        const originalRequestPost = request.post;
+        request.post = (options) => {
+            options.form = {oauth_verifier: verifier};
+            return originalRequestPost(options);
+        }
+        return t.post(`https://api.twitter.com/oauth/access_token`)
             .then(r => {
                 console.log(r.data);
             JSON.parse = originalJsonParse;
+                request.post = originalRequestPost;
             try {
                 const data = originalJsonParse(r.data);
                 if (data.errors) {
@@ -184,6 +191,7 @@ module.exports = (cache) => {
             }
         }).catch(e => {
             JSON.parse = originalJsonParse;
+                request.post = originalRequestPost;
             throw e;
         });
     };

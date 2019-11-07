@@ -140,7 +140,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
-    console.log({ requestTokenSecret });
+    console.log({ oauthVerifier, oauthToken });
     const obj = await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
     console.log(obj);
     const {oauth_token, oauth_token_secret } = obj

@@ -140,14 +140,8 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
-    console.log({ oauthVerifier, oauthToken });
-    const obj = await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
-    console.log(obj);
-    const {oauth_token, oauth_token_secret } = obj
-    // We need to verify the user's identity, so we don't allow others to edit other folks' settings
-    // Since Twitter doesn't enforce the screen_name parameter
-    const { screen_name } = await twitter.getUser(oauth_token, oauth_token_secret );
-
+    const {oauth_token, oauth_token_secret, screen_name } =
+        await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
     if (screen_name !== username) {
         return {
             statusCode: 403,

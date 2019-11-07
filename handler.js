@@ -134,15 +134,15 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     }
 
     const fbToken = event.queryStringParameters.fbtoken;
-    const username = event.queryStringParameters.username;
+    const userWereTryingToGainAccessFor = event.queryStringParameters.username;
     const action = event.queryStringParameters.action;
     const oauthToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
-    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${username}`);
-    const {oauth_token, oauth_token_secret, screen_name } =
+    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWereTryingToGainAccessFor}`);
+    const {oauth_token, oauth_token_secret, screen_name: actualUser } =
         await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
-    if (screen_name !== username) {
+    if (actualUser !== userWereTryingToGainAccessFor) {
         return {
             statusCode: 403,
             body: "Unauthorized."
@@ -160,12 +160,12 @@ module.exports.completeTwitterSignIn = async (event, context) => {
             notifications: true,
         };
     }
-    console.log("Saving settings for " + username, JSON.stringify(data));
-    await cache.setAsync(`settings-${username}`, JSON.stringify(data));
+    console.log("Saving settings for " + userWereTryingToGainAccessFor, JSON.stringify(data));
+    await cache.setAsync(`settings-${userWereTryingToGainAccessFor}`, JSON.stringify(data));
     const redirect = {
         statusCode: 302,
         headers: {
-            Location: `http://${process.env.EXTERNAL_URL}/${username}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
+            Location: `http://${process.env.EXTERNAL_URL}/${userWereTryingToGainAccessFor}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
         }
     };
     return redirect;

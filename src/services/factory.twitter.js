@@ -183,6 +183,8 @@ module.exports = (cache) => {
 
     const getUser = (accessToken, accessTokenSecret) => {
         const t = new Twit({
+            consumer_key: process.env.TWITTER_CONSUMER_KEY,
+            consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
             access_token: accessToken,
             access_token_secret: accessTokenSecret,
         });

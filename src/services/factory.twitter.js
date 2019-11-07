@@ -134,7 +134,7 @@ module.exports = (cache) => {
         const originalRequestPost = request.post;
         request.post = (options) => {
             options.oauth.callback = callbackUrl;
-            options.oauth.x_auth_access_type = 'read';
+            options.form = {x_auth_access_type: 'read'};
             return originalRequestPost(options);
         }
         return t.post(url).then(r => {

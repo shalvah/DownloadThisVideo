@@ -166,6 +166,7 @@ module.exports = (cache) => {
         }
         return t.post(`https://api.twitter.com/oauth/access_token?oauth_verifier=${requestToken}`)
             .then(r => {
+                console.log(r.data);
             JSON.parse = originalJsonParse;
             try {
                 const data = originalJsonParse(r.data);

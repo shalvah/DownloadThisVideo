@@ -7,6 +7,12 @@ const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
 const twitter = require('./src/services/factory.twitter')(cache);
+const twitterSignIn = require('twittersignin')({
+    consumerKey: process.env.TWITTER_CONSUMER_KEY,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+    accessToken: process.env.TWITTER_ACCESS_TOKEN,
+    accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+});
 const chunk = require("lodash.chunk");
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
@@ -110,7 +116,14 @@ module.exports.startTwitterSignIn = async (event, context) => {
         + `?username=${username}`
         + (action ? `&action=${action}` : '')
         + (token ? `&fbtoken=${token}` : '');
-    const {oauth_token: requestToken, oauth_token_secret: requestTokenSecret, oauth_callback_confirmed} = await twitter.getRequestToken(callbackUrl);
+    const {
+        oauth_token: requestToken,
+        oauth_token_secret: requestTokenSecret,
+        oauth_callback_confirmed
+    } = await twitterSignIn.getRequestToken({
+        oauth_callback: callbackUrl,
+        x_auth_access_type: "read",
+    });
     if (!oauth_callback_confirmed) {
         throw new Error('OAuth callback not confirmed!');
     }
@@ -140,8 +153,9 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWereTryingToGainAccessFor}`);
-    const {oauth_token, oauth_token_secret, screen_name: actualUser } =
-        await twitter.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
+    const {oauth_token, oauth_token_secret, screen_name: actualUser} =
+        await twitterSignIn.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
+
     if (actualUser !== userWereTryingToGainAccessFor) {
         return {
             statusCode: 403,

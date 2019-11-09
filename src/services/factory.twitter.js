@@ -117,96 +117,6 @@ module.exports = (cache) => {
             .catch(e => wrapTwitterErrors('statuses/show', e));
     };
 
-    const getRequestToken = (callbackUrl) => {
-        // Monkey-patching JSON.parse because
-        // https://github.com/ttezel/twit/issues/475#issuecomment-547688260
-        const originalJsonParse = JSON.parse.bind(JSON);
-        JSON.parse = function (value) {
-            try {
-                return originalJsonParse(value);
-            } catch (e) {
-                return value;
-            }
-        }
-
-        const url = "https://api.twitter.com/oauth/request_token";
-        const request = require("request");
-        const originalRequestPost = request.post;
-        request.post = (options) => {
-            options.oauth.callback = callbackUrl;
-            options.form = {x_auth_access_type: 'read'};
-            return originalRequestPost(options);
-        }
-        return t.post(url).then(r => {
-            JSON.parse = originalJsonParse;
-            request.post = originalRequestPost;
-            try {
-                const data = JSON.parse(r.data);
-                if (data.errors) {
-                    return Promise.reject(data);
-                }
-            } catch (e) {
-                return require('querystring').decode(r.data);
-            }
-        }).catch(e => {
-            JSON.parse = originalJsonParse;
-            request.post = originalRequestPost;
-            throw e;
-        });
-    };
-
-    const getAccessToken = (requestToken, requestTokenSecret, verifier) => {
-        const t = new Twit({
-            consumer_key: process.env.TWITTER_CONSUMER_KEY,
-            consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-            access_token: requestToken,
-            access_token_secret: requestTokenSecret,
-        });
-        const originalJsonParse = JSON.parse.bind(JSON);
-        JSON.parse = function (value) {
-            try {
-                return JSON.parse(value);
-            } catch (e) {
-                return value;
-            }
-        }
-        const request = require("request");
-        const originalRequestPost = request.post;
-        request.post = (options) => {
-            options.form = {oauth_verifier: verifier};
-            return originalRequestPost(options);
-        }
-        return t.post(`https://api.twitter.com/oauth/access_token`)
-            .then(r => {
-                console.log(r.data);
-                JSON.parse = originalJsonParse;
-                request.post = originalRequestPost;
-                try {
-                    const data = originalJsonParse(r.data);
-                    if (data.errors) {
-                        return Promise.reject(data);
-                    }
-                } catch (e) {
-                    return require('querystring').decode(r.data);
-                }
-            }).catch(e => {
-                JSON.parse = originalJsonParse;
-                request.post = originalRequestPost;
-                throw e;
-            });
-    };
-
-    const getUser = (accessToken, accessTokenSecret) => {
-        const t = new Twit({
-            consumer_key: process.env.TWITTER_CONSUMER_KEY,
-            consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-            access_token: accessToken,
-            access_token_secret: accessTokenSecret,
-        });
-        return t.get(`account/verify_credentials`, {skip_status: 1})
-            .then(r => (console.log(r), r.data));
-    };
-
     return {
         getMentions,
         reply,
@@ -214,9 +124,6 @@ module.exports = (cache) => {
         shouldDownloadVid,
         getActualTweetsReferenced,
         fetchTweet,
-        getRequestToken,
-        getAccessToken,
-        getUser,
     };
 
 };

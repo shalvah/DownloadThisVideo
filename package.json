@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shalvah/NotYourNass.git"
+    "url": "git+https://github.com/shalvah/DownloadThisVideo.git"
   },
   "engines": {
     "node": "8.10.0"
@@ -29,7 +29,8 @@
     "lodash.chunk": "^4.2.0",
     "redis": "^2.8.0",
     "twit": "^2.2.9",
-    "twitter-error-handler": "^2.0.0"
+    "twitter-error-handler": "^2.0.0",
+    "twittersignin": "^0.1.0"
   },
   "devDependencies": {
     "dotenv": "^8.0.0",

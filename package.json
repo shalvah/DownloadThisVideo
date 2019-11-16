@@ -28,8 +28,6 @@
     "handlebars": "^4.5.2",
     "lodash.chunk": "^4.2.0",
     "redis": "^2.8.0",
-    "serverless-plugin-aws-alerts": "^1.4.0",
-    "serverless-dotenv-plugin": "^2.1.1",
     "twit": "^2.2.9",
     "twitter-error-handler": "^2.1.0",
     "twittersignin": "^1.0.0"
@@ -40,6 +38,8 @@
     "jasmine": "^3.5.0",
     "mitm": "^1.7.0",
     "mock-require": "^3.0.3",
-    "redis-mock": "^0.46.0"
+    "redis-mock": "^0.46.0",
+    "serverless-plugin-aws-alerts": "^1.4.0",
+    "serverless-dotenv-plugin": "^2.1.1"
   }
 }

@@ -50,13 +50,11 @@ package:
   include:
   - views/**
   exclude:
-  - README.md
-  - .gitignore
-  - .env
-  - .env.example
-  - .idea/**
-  - .git/**
-  - this-vid.png
+  - "*.md"
+  - "*.png"
+  - "*.ico"
+  - .*
+  - .*/**
   - awscli-bundle.zip
   - awscli-bundle/**
   - spec/**

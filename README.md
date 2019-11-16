@@ -8,7 +8,7 @@ Easily download videos/GIFs off Twitter. Mention the bot (@this_vid) in a reply 
 - [AWS Lambda](https://aws.amazon.com/lambda/) with the [Serverless Framework](http://serverless.com)
 - [AWS SNS](http://aws.amazon.com/sns)
 - [Redis](http://redis.io)
-- Node.js 8.10
+- Node.js
 
 ### Implementation
 The bot consists of several AWS Lambda functions that work in tandem:
@@ -39,3 +39,4 @@ These folks help to keep this running. If you've benefited from this work and wo
 - Sharee
 - Luca Turgut
 - Xavier Brown
+- Uzo Olisemeka

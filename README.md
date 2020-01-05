@@ -39,4 +39,3 @@ These folks help to keep this running. If you've benefited from this work and wo
 - Sharee
 - Luca Turgut
 - Xavier Brown
-- Uzo Olisemeka

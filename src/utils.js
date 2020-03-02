@@ -143,17 +143,6 @@ const getRelativeTime = (time) => {
     }
 };
 
-const getSponsoredLink = () => {
-    const links = [
-        {
-            text: "Get a .SPACE domain name for just $1. Use the code GETMYSPACE on www.get.space.",
-            url: "http://get.space/?utm_source=ThisVid&utm_medium=Twitter&utm_campaign=Banner1"
-        },
-    ];
-
-    return links[0];
-};
-
 const SUCCESS = 'Success';
 
 const FAIL = 'Fail';
@@ -169,7 +158,6 @@ module.exports = {
     finish,
     randomSuccessResponse,
     getRelativeTime,
-    getSponsoredLink,
     SUCCESS,
     FAIL,
     UNCERTAIN

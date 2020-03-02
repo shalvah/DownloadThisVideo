@@ -2,7 +2,7 @@
 
 const cache = require('./src/services/cache');
 
-const {finish, getRelativeTime, getSponsoredLink} = require('./src/utils');
+const {finish, getRelativeTime} = require('./src/utils');
 const sns = require('./src/services/sns');
 const cloudwatch = require('./src/services/cloudwatch');
 const ops = require('./src/services/tweet_operations');
@@ -81,7 +81,7 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             };
             downloads = downloads.map(prepareDownloadforFrontend);
 
-            return finish().render('downloads', {username, downloads, settings, link: getSponsoredLink()});
+            return finish().render('downloads', {username, downloads, settings});
         }
     }
 };
@@ -92,13 +92,13 @@ module.exports.page = async (event, context) => {
         case 'faqs':
         case 'faq': {
             const faqs = require('./faqs');
-            return finish().render('faq', {faqs, link: getSponsoredLink()});
+            return finish().render('faq', {faqs});
         }
     }
 };
 
 module.exports.getHomePage = async (event, context) => {
-    return finish().render('home', {link: getSponsoredLink()});
+    return finish().render('home');
 };
 
 module.exports.startTwitterSignIn = async (event, context) => {

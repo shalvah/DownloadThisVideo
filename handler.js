@@ -69,6 +69,9 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
+        case 'your-handle':
+            return finish().render('your-handle');
+
         default: {
             const getSettings = cache.getAsync(`settings-${username}`);
             const getDownloads = ops.getUserDownloads(cache, username);

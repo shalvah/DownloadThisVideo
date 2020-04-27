@@ -66,6 +66,9 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
     let username = event.pathParameters.username;
     username = typeof username == "string" ? username.replace(/\/$/, '') : username;
     switch (username) {
+        case 'ads.txt':
+            return finish()
+                .sendTextFile('ads.txt', {'content-type': 'text/plain; charset=UTF-8'});
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});

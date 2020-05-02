@@ -70,18 +70,12 @@ const finish = (cache = null) => {
             };
         },
 
-        render(view, data = null) {
+        render(view, data = {}) {
             view = path.resolve(__dirname, '..', 'views', `${view}.hbs`);
             let body = fs.readFileSync(view, "utf8");
 
-            if (!data) {
-                // no need to bother compiling Handlebars template
-                return {
-                    statusCode: 200,
-                    headers: {"content-type": "text/html; charset=utf-8"},
-                    body
-                };
-            }
+            data['gTagId'] = process.env.GTAG_ID;
+            data['adCode'] = process.env.AD_CODE;
 
             let template = hbs.compile(body);
             body = template(data);

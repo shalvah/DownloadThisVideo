@@ -1,14 +1,15 @@
 <head>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163298939-1"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gTagId }}"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
 
-        gtag('config', 'UA-163298939-1');
+    gtag('config', '{{ gTagId }}');
     </script>
-    <script data-ad-client="ca-pub-5043199119629811" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script data-ad-client="{{ adCode }}" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico"

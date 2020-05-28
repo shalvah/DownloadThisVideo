@@ -38,6 +38,8 @@ provider:
     TWITTER_SCREEN_NAME: ${env:TWITTER_SCREEN_NAME}
     EXTERNAL_URL: ${env:EXTERNAL_URL}
     FIREBASE_PROJECT_ID: ${env:FIREBASE_PROJECT_ID}
+    GTAG_ID: ${env:GTAG_ID}
+    AD_CODE: ${env:AD_CODE}
     TOPIC_ARN:
       "Fn::Join":
       - ':'

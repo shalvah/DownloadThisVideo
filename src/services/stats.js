@@ -1,28 +1,18 @@
 'use strict';
 
-const Twit = require('twit');
-const t = new Twit({
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    access_token: process.env.TWITTER_ACCESS_TOKEN,
-    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-});
-
-module.exports = (cache, cloudwatch) => {
+module.exports = (cache, cloudwatch, twitter) => {
     function getFollowersCount() {
-        return t.get(`account/verify_credentials`, {screen_name: process.env.TWITTER_SCREEN_NAME})
-            .then(r => r.data)
-            .then(user => Number(user.followers_count).toLocaleString());
+        return twitter.getFollowersCount();
     }
 
     function getMentionsCount() {
         // Get from AWS
-        return cloudwatch.getNumberOfMentions().then(r => (console.log(r), r));
+        return cloudwatch.getNumberOfMentions();
     }
 
     function getDownloadsInLast7Days() {
         return cache.scanAsync(0, 'match', 'tweet-*', 'count', 10000000)
-            .then(results => results[1].length);
+            .then(results => Number(results[1].length).toLocaleString());
     }
 
     function getPageViewsCount() {

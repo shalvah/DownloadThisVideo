@@ -77,5 +77,5 @@ function getNumberOfMentions(results) {
         ],
     };
     return cloudwatch.getMetricStatistics(params).promise()
-        .then(r => r.Datapoints[0].Sum);
+        .then(r => Number(r.Datapoints[0].Sum).toLocaleString());
 }

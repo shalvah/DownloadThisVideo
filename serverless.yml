@@ -25,6 +25,11 @@ provider:
         - cloudwatch:PutMetricData
       Resource:
         - "*"
+    - Effect: Allow
+      Action:
+        - cloudwatch:GetMetricStatistics
+      Resource:
+        - "*"
 
   environment:
     TWITTER_CONSUMER_KEY: ${env:TWITTER_CONSUMER_KEY}

@@ -74,10 +74,18 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             const [
                 mentions, downloads, followers, pageviews,
             ] = await Promise.all([
-                stats.getNumberOfMentionsInPast7Days(),
-                stats.getDownloadsInPast7Days(),
-                stats.getFollowersCount(),
-                stats.getPageViewsInPast2Days(),
+                cache.getAsync('stats-mentions7').then(r => {
+                    return r == null ? stats.getNumberOfMentionsInPast7Days() : r
+                }),
+                cache.getAsync('stats-downloads7').then(r => {
+                    return r == null ? stats.getDownloadsInPast7Days() : r
+                }),
+                cache.getAsync('stats-followers').then(r => {
+                    return r == null ? stats.getFollowersCount() : r
+                }),
+                cache.getAsync('stats-pageviewsY').then(r => {
+                    return r == null ? stats.getPageViewsInPast2Days() : r
+                }),
             ]);
             return finish().render('open', {mentions, downloads, pageviews, followers});
         }

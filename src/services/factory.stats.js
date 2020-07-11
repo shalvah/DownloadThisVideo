@@ -12,17 +12,30 @@ const analytics = google.analyticsreporting({
 
 module.exports = (cache, cloudwatch, twitter) => {
     function getFollowersCount() {
-        return twitter.getFollowersCount().then(r => Number(r).toLocaleString());
+        return twitter.getFollowersCount()
+            .then(async r => {
+                const l = Number(r).toLocaleString();
+                await cache.setAsync('stats-followers', l, 'EX', 1 * 60 * 60);
+                return l;
+            });
     }
 
     function getNumberOfMentionsInPast7Days() {
         return cloudwatch.getNumberOfMentionsPast7Days()
-            .then(r => Number(r).toLocaleString());
+            .then(async r => {
+                const l = Number(r).toLocaleString();
+                await cache.setAsync('stats-mentions7', l, 'EX', 1 * 60 * 60);
+                return l;
+            });
     }
 
     function getDownloadsInPast7Days() {
         return cache.scanAsync(0, 'match', 'tweet-*', 'count', 10000000)
-            .then(results => Number(results[1].length).toLocaleString());
+            .then(async r => {
+                const l = Number(r[1].length).toLocaleString();
+                await cache.setAsync('stats-downloads7', l, 'EX', 1 * 60 * 60);
+                return l;
+            });
     }
 
     function getPageViewsInPast2Days() {
@@ -37,7 +50,12 @@ module.exports = (cache, cloudwatch, twitter) => {
                         }
                     ]
             }
-        }).then(r => Number(r.data.reports[0].data.totals[0].values[0]).toLocaleString());
+        })
+            .then(async r => {
+                const l = Number(r.data.reports[0].data.totals[0].values[0]).toLocaleString();
+                await cache.setAsync('stats-pageviewsY', l, 'EX', 1 * 60 * 60);
+                return l;
+            })
     }
 
     return {
@@ -45,7 +63,7 @@ module.exports = (cache, cloudwatch, twitter) => {
         getDownloadsInPast7Days,
         getFollowersCount,
         getPageViewsInPast2Days,
-    }
+    };
 };
 
 

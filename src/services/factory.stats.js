@@ -2,12 +2,12 @@
 
 module.exports = (cache, cloudwatch, twitter) => {
     function getFollowersCount() {
-        return twitter.getFollowersCount();
+        return twitter.getFollowersCount().then(r => Number(r).toLocaleString());
     }
 
-    function getMentionsCount() {
-        // Get from AWS
-        return cloudwatch.getNumberOfMentions();
+    function getNumberOfMentionsPast7Days() {
+        return cloudwatch.getNumberOfMentionsPast7Days()
+            .then(r => Number(r).toLocaleString());
     }
 
     function getDownloadsInLast7Days() {
@@ -16,23 +16,36 @@ module.exports = (cache, cloudwatch, twitter) => {
     }
 
     function getPageViewsCount() {
-        // Get from GA
-        return 1;
+        const {google} = require('googleapis');
+        const auth = new google.auth.GoogleAuth({
+            keyFile: __dirname + '/../../thisvid-analytics-serviceaccount.json',
+            scopes: ['https://www.googleapis.com/auth/analytics.readonly'],
+        });
+        const analytics = google.analyticsreporting({
+            version: 'v4',
+            auth
+        });
+        return analytics.reports.batchGet({
+            requestBody: {
+                reportRequests:
+                    [
+                        {
+                            viewId: "215671081",
+                            dateRanges: [{startDate: "2daysAgo", endDate: "today"}],
+                            metrics: [{expression: "ga:pageviews"}]
+                        }
+                    ]
+            }
+        }).then(r => {
+            return r.data.reports[0].data.totals[0].values[0];
+        });
     }
-
-
-    function getPushNotificationsCount() {
-        // Get from Firebase?
-        return 1;
-    }
-
 
     return {
-        getMentionsCount,
+        getNumberOfMentionsPast7Days,
         getDownloadsInLast7Days,
         getFollowersCount,
         getPageViewsCount,
-        getPushNotificationsCount,
     }
 };
 

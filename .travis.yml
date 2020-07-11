@@ -28,6 +28,9 @@ jobs:
       aws --region us-east-1 s3 cp \
       s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
       ./downloadthisvideo-serviceaccount.json && \
+      aws --region us-east-1 s3 cp \
+      s3://shalvah-creds/thisvid-analytics-serviceaccount.json  \
+      ./thisvid-analytics-serviceaccount.json && \
       sls deploy
 
   - stage: predeploy

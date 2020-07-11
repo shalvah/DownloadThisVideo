@@ -46,6 +46,16 @@
             padding-bottom: 15px;
         }
 
+        .small-text {
+            font-size: 0.7em; 
+            margin-left: 25px; 
+            margin-right: 25px;
+            margin-top: 16px;
+            font-weight: 600;
+            padding: 1rem;
+            border: 1px solid #000;
+        }
+
         footer {
             height: 20%;
             text-align: center;
@@ -54,6 +64,10 @@
 
         a {
             text-decoration: none;
+        }
+
+        ins {
+            display: block;
         }
     </style>
 </head>
@@ -69,10 +83,10 @@
     </div>
     <div class="list-item">
         ⌚ Give it a minute, and @this_vid will reply with a link to your download. 🔗<br>
-        <small style="font-size: 0.7em; margin-left: 25px; margin-right: 25px;">PS. Twitter has a limit on the number of
+        <div class="small-text">PS: Twitter has a limit on the number of
             tweets we can post, so if you don't see a reply after 2 minutes, try checking
             thisvid.space/your-Twitter-handle for your download.
-        </small>
+        </div>
     </div>
 
     <br>
@@ -92,7 +106,6 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <!-- Testing Ad Unit -->
 <ins class="adsbygoogle"
-     style="display:block"
      data-ad-client="{{ adCode }}"
      data-ad-slot="1262324327"
      data-ad-format="auto"
@@ -104,7 +117,6 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <!-- Testing Ad Unit -->
 <ins class="adsbygoogle"
-     style="display:block"
      data-ad-client="{{ adCode }}"
      data-ad-slot="1262324327"
      data-ad-format="auto"

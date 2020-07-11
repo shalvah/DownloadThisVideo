@@ -3,7 +3,7 @@
 module.exports = {
     logResults,
     trackApiCalls,
-    getNumberOfMentions,
+    getNumberOfMentionsPast7Days,
 };
 
 const { SUCCESS, FAIL, UNCERTAIN } = require('./../utils');
@@ -59,7 +59,7 @@ function trackApiCalls(endpoint) {
     return Promise.all(params.map(p => cloudwatch.putMetricData(p).promise()));
 }
 
-function getNumberOfMentions(results) {
+function getNumberOfMentionsPast7Days(results) {
     const now = new Date();
     const params = {
         StartTime: new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)), // 7 days ago
@@ -77,5 +77,5 @@ function getNumberOfMentions(results) {
         ],
     };
     return cloudwatch.getMetricStatistics(params).promise()
-        .then(r => Number(r.Datapoints[0].Sum).toLocaleString());
+        .then(r => r.Datapoints[0].Sum);
 }

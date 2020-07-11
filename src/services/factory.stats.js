@@ -5,17 +5,17 @@ module.exports = (cache, cloudwatch, twitter) => {
         return twitter.getFollowersCount().then(r => Number(r).toLocaleString());
     }
 
-    function getNumberOfMentionsPast7Days() {
+    function getNumberOfMentionsInPast7Days() {
         return cloudwatch.getNumberOfMentionsPast7Days()
             .then(r => Number(r).toLocaleString());
     }
 
-    function getDownloadsInLast7Days() {
+    function getDownloadsInPast7Days() {
         return cache.scanAsync(0, 'match', 'tweet-*', 'count', 10000000)
             .then(results => Number(results[1].length).toLocaleString());
     }
 
-    function getPageViewsCount() {
+    function getPageViewsInPast2Days() {
         const {google} = require('googleapis');
         const auth = new google.auth.GoogleAuth({
             keyFile: __dirname + '/../../thisvid-analytics-serviceaccount.json',
@@ -36,16 +36,14 @@ module.exports = (cache, cloudwatch, twitter) => {
                         }
                     ]
             }
-        }).then(r => {
-            return r.data.reports[0].data.totals[0].values[0];
-        });
+        }).then(r => Number(r.data.reports[0].data.totals[0].values[0]).toLocaleString());
     }
 
     return {
-        getNumberOfMentionsPast7Days,
-        getDownloadsInLast7Days,
+        getNumberOfMentionsInPast7Days,
+        getDownloadsInPast7Days,
         getFollowersCount,
-        getPageViewsCount,
+        getPageViewsInPast2Days,
     }
 };
 

@@ -31,7 +31,7 @@ module.exports = (cache, cloudwatch, twitter) => {
                     [
                         {
                             viewId: "215671081",
-                            dateRanges: [{startDate: "2daysAgo", endDate: "today"}],
+                            dateRanges: [{startDate: "yesterday", endDate: "yesterday"}],
                             metrics: [{expression: "ga:pageviews"}]
                         }
                     ]

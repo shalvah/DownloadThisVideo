@@ -90,7 +90,8 @@ const updateUserDownloads = (tweet, link, cache) => {
 
 const handleTweetProcessingSuccess = (tweet, link, { cache, twitter }) => {
     return Promise.all([
-        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link, 'EX', 7 * 24 * 60 * 60),
+        cache.setAsync(`tweet-${tweet.referencing_tweet}`, link, 'EX', 7 * 24 * 60 * 60)
+            .catch(() => {}), // This is only a cache to reduce API calls
         updateUserDownloads(tweet, link, cache),
         twitter.replyWithRedirect(tweet),
         sendNotification(tweet.author.toLowerCase(), cache),

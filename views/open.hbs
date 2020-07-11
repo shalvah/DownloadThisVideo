@@ -1,5 +1,102 @@
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gTagId }}"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
 
-f: {{ followers }}
-(d 7d): {{ downloads }}
-(m 7d): {{ mentions }}
-(v yesterday): {{ pageviews }}
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', '{{ gTagId }}');
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico"
+          type="image/x-icon" />
+
+    <!-- Primary Meta Tags -->
+    <title>this_vid Stats</title>
+    <meta name="title" content="this_vid Stats">
+    <meta name="description" content="The easiest way to download videos or GIFs from Twitter">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thisvid.space/">
+    <meta property="og:title" content="this_vid Stats">
+    <meta property="og:description" content="The easiest way to download any video or GIF from Twitter ">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://thisvid.space/">
+    <meta property="twitter:title" content="this_vid Stats">
+    <meta property="twitter:description" content="The easiest way to download any video or GIF from Twitter ">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Calibri, sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .list-item {
+            padding-bottom: 15px;
+        }
+
+        footer {
+            height: 20%;
+            text-align: center;
+            padding-bottom: 6px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <h3>Stats from @this_vid/thisvid.space</h3>
+    <div>
+        <b>{{ followers }}</b> <small>Twitter followers</small>
+    </div>
+    <br>
+    <div>
+        <b>{{ mentions }}</b> <small>Twitter mentions <span style="color: grey">in the past 7 days</span></small>
+    </div>
+    <br>
+    <div>
+        <b>{{ downloads }}</b> <small>videos downloaded <span style="color: grey">in the past 7 days</span></small>
+    </div>
+    <br>
+    <div>
+        <b>{{ pageviews }}</b> <small>page views <span style="color: grey">yesterday</span></small>
+    </div>
+    <br>
+    <div>
+        <b>$69</b> <small>in expenses <span style="color: grey">last month</span></small> <span
+            style="font-size: x-small;">(nice)</span>
+    </div>
+    <br>
+</div>
+
+<br>
+<footer style="margin-bottom: 0; padding-bottom: 0">
+    <div>
+        <small style="font-size: 0.7em;">
+            <a href="https://www.patreon.com/shalvah">Support @this_vid</a>
+            &nbsp;|&nbsp;
+            <a href="/p/faq">See our FAQ</a>
+            &nbsp;|&nbsp;
+            <a href="https://github.com/shalvah/DownloadThisVideo">Check out the source code</a>
+        </small>
+    </div>
+</footer>
+</body>

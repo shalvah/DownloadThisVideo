@@ -33,7 +33,7 @@ module.exports = (cache, cloudwatch, twitter) => {
         return cache.scanAsync(0, 'match', 'tweet-*', 'count', 10000000)
             .then(async r => {
                 const l = Number(r[1].length).toLocaleString();
-                await cache.setAsync('stats-downloads7', l, 'EX', 1 * 60 * 60);
+                await cache.setAsync('stats-downloads7', l, 'EX', 30 * 60);
                 return l;
             });
     }

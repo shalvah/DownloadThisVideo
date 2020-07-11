@@ -2,11 +2,10 @@
 
 module.exports = {
     logResults,
-    trackApiCalls,
     getNumberOfMentionsPast7Days,
 };
 
-const { SUCCESS, FAIL, UNCERTAIN } = require('./../utils');
+const { SUCCESS, UNCERTAIN } = require('./../utils');
 const AWS = require('aws-sdk');
 const cloudwatch = new AWS.CloudWatch();
 
@@ -51,15 +50,7 @@ function generateMetricsPayload (metricName) {
     }
 }
 
-function trackApiCalls(endpoint) {
-    const getPayload = generateMetricsPayload('TwitterApiCalls');
-    const params = [
-        getPayload('Endpoint', endpoint, 1)
-    ];
-    return Promise.all(params.map(p => cloudwatch.putMetricData(p).promise()));
-}
-
-function getNumberOfMentionsPast7Days(results) {
+function getNumberOfMentionsPast7Days() {
     const now = new Date();
     const params = {
         StartTime: new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000)), // 7 days ago

@@ -13,6 +13,7 @@ const twitterSignIn = require('twittersignin')({
     accessToken: process.env.TWITTER_ACCESS_TOKEN,
     accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 });
+const stats = require('./src/services/factory.stats')(cache, cloudwatch, twitter);
 const chunk = require("lodash.chunk");
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
@@ -69,6 +70,17 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
         case 'ads.txt':
             return finish()
                 .sendTextFile('ads.txt', {'content-type': 'text/plain; charset=UTF-8'});
+        case 'open': {
+            const [
+                mentions, downloads, followers, pageviews,
+            ] = await Promise.all([
+                stats.getNumberOfMentionsInPast7Days(),
+                stats.getDownloadsInPast7Days(),
+                stats.getFollowersCount(),
+                stats.getPageViewsInPast2Days(),
+            ]);
+            return finish().render('open', {mentions, downloads, pageviews, followers});
+        }
         case 'firebase-messaging-sw.js':
             return finish()
                 .sendTextFile('firebase-messaging-sw.js', {'content-type': 'text/javascript; charset=UTF-8'});
@@ -108,7 +120,7 @@ module.exports.getHomePage = async (event, context) => {
 };
 
 module.exports.startTwitterSignIn = async (event, context) => {
-    console.log({ event });
+    console.log({event});
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
             throw new Error('Unknown value of action in query params');

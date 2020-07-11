@@ -1,5 +1,15 @@
 'use strict';
 
+const {google} = require('googleapis');
+const auth = new google.auth.GoogleAuth({
+    keyFile: __dirname + '/../../thisvid-analytics-serviceaccount.json',
+    scopes: ['https://www.googleapis.com/auth/analytics.readonly'],
+});
+const analytics = google.analyticsreporting({
+    version: 'v4',
+    auth
+});
+
 module.exports = (cache, cloudwatch, twitter) => {
     function getFollowersCount() {
         return twitter.getFollowersCount().then(r => Number(r).toLocaleString());
@@ -16,15 +26,6 @@ module.exports = (cache, cloudwatch, twitter) => {
     }
 
     function getPageViewsInPast2Days() {
-        const {google} = require('googleapis');
-        const auth = new google.auth.GoogleAuth({
-            keyFile: __dirname + '/../../thisvid-analytics-serviceaccount.json',
-            scopes: ['https://www.googleapis.com/auth/analytics.readonly'],
-        });
-        const analytics = google.analyticsreporting({
-            version: 'v4',
-            auth
-        });
         return analytics.reports.batchGet({
             requestBody: {
                 reportRequests:

@@ -25,7 +25,7 @@
     "aws-sdk": "^2.568.0",
     "bluebird": "^3.7.1",
     "firebase-admin": "^8.7.0",
-    "googleapis": "^52.1.0",
+    "googleapis": "52.1.0",
     "handlebars": "^4.7.6",
     "lodash.chunk": "^4.2.0",
     "redis": "^2.8.0",

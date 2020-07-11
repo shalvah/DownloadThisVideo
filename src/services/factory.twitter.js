@@ -119,7 +119,7 @@ module.exports = (cache) => {
 
     const getFollowersCount = () => {
         return t.get(`account/verify_credentials`, {screen_name: process.env.TWITTER_SCREEN_NAME})
-            .then(r => r.data.user.followers_count);
+            .then(r => r.data.followers_count);
     }
 
     return {

@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- "10.13"
+- 12
 
 env:
 - SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space FIREBASE_PROJECT_ID=downloadthisvideo-662ae TWITTER_CALLBACK_URL="https://thisvid.space/_/completetwittersignin"

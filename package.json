@@ -41,7 +41,6 @@
     "mitm": "^1.7.0",
     "mock-require": "^3.0.3",
     "redis-mock": "^0.46.0",
-    "serverless-plugin-aws-alerts": "^1.4.0",
     "serverless-dotenv-plugin": "^2.1.1"
   }
 }

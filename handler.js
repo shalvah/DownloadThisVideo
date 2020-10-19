@@ -22,7 +22,7 @@ const twitterSignIn = require('twittersignin')({
 const stats = require('./src/services/factory.stats')(cache, cloudwatch, twitter);
 const chunk = require("lodash.chunk");
 
-module.exports.fetchTweetsToDownload = async (event, context) => {
+module.exports.fetchTweetsToDownload = Sentry.AWSLambda.wrapHandler(async (event, context) => {
     let lastTweetRetrieved = null;
     let count = 0;
     let mentions = await twitter.getMentions();
@@ -37,9 +37,11 @@ module.exports.fetchTweetsToDownload = async (event, context) => {
         await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
     }
     return finish().success(`Published ${count} tweets`);
-};
+}, {
+    timeoutWarningLimit: 5000,
+});
 
-module.exports.sendDownloadLink = async (event, context) => {
+module.exports.sendDownloadLink = Sentry.AWSLambda.wrapHandler(async (event, context) => {
     const tweets = sns.getPayloadFromSnsEvent(event);
     // The lookup endpoint only allows fetching 100 tweets at a time
     const chunks = chunk(tweets, 100);
@@ -56,7 +58,9 @@ module.exports.sendDownloadLink = async (event, context) => {
         return cloudwatch.logResults(results);
     }));
     return finish().success(`Processed ${tweets.length} tasks`);
-};
+}, {
+    timeoutWarningLimit: 5000,
+});
 
 module.exports.retryFailedTasks = async (event, context) => {
     const tweets = await cache.lrangeAsync('Fail', 0, -1);

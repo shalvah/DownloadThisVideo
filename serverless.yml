@@ -1,7 +1,6 @@
 service: DownloadThisVideo
 plugins:
 - serverless-dotenv-plugin
-- serverless-plugin-aws-alerts
 
 provider:
   name: aws
@@ -73,10 +72,6 @@ functions:
     handler: handler.fetchTweetsToDownload
     events:
     - schedule: rate(1 minute)
-    alarms:
-    - functionErrors
-    - name: functionDuration
-      threshold: 5000
 
   retryFailedTasks:
     handler: handler.retryFailedTasks
@@ -85,10 +80,6 @@ functions:
     handler: handler.sendDownloadLink
     events:
     - sns: newMention
-    alarms:
-    - functionErrors
-    - name: functionDuration
-      threshold: 5000
 
   startTwitterSignIn:
     handler: handler.startTwitterSignIn
@@ -138,25 +129,3 @@ functions:
     - http:
         path: /
         method: get
-
-custom:
-  alerts:
-    definitions:
-      functionErrors:
-        # alert if function throws an error
-        threshold: 1
-        period: 60
-        treatMissingData: notBreaching
-      functionDuration:
-        # alert if function takes more than 2 seconds too many times
-        threshold: 2000
-        period: 60
-        datapointsToAlarm: 10
-        evaluationPeriods: 30
-        treatMissingData: notBreaching
-    topics:
-      alarm:
-        topic: ${self:service}-dev-alerts-alarm
-        notifications:
-        - protocol: email
-          endpoint: shalvah.adebayo+awsalerts@gmail.com

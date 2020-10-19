@@ -131,10 +131,6 @@ functions:
           parameters:
             paths:
               username: true
-    alarms:
-    - functionErrors
-    - name: functionDuration
-      threshold: 2000
 
   getHomePage:
     handler: handler.getHomePage
@@ -142,10 +138,6 @@ functions:
     - http:
         path: /
         method: get
-    alarms:
-    - functionErrors
-    - name: functionDuration
-      threshold: 1000
 
 custom:
   alerts:

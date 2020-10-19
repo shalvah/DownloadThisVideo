@@ -131,9 +131,11 @@ module.exports.page = async (event, context) => {
     }
 };
 
-module.exports.getHomePage = async (event, context) => {
+module.exports.getHomePage = Sentry.AWSLambda.wrapHandler(async (event, context) => {
     return finish().render('home');
-};
+}, {
+    timeoutWarningLimit: 1000,
+});
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({event});

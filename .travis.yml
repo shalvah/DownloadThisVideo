@@ -9,7 +9,7 @@ cache:
   directories:
   - node_modules
 
-install: npm i && npm i -g serverless
+install: NODE_ENV=development npm i && npm i -g serverless
 
 stages:
 - name: predeploy

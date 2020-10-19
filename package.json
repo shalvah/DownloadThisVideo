@@ -3,7 +3,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "lint": "eslint src handler.js",
+    "lint": "./node_modules/.bin/eslint src handler.js",
     "test-init": "jasmine init",
     "test": "jasmine"
   },

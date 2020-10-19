@@ -45,6 +45,7 @@ provider:
     SENTRY_DSN: ${env:SENTRY_DSN}
     GTAG_ID: ${env:GTAG_ID}
     AD_CODE: ${env:AD_CODE}
+    NODE_ENV: ${env:NODE_ENV}
     TOPIC_ARN:
       "Fn::Join":
       - ':'

@@ -22,7 +22,7 @@ const twitterSignIn = require('twittersignin')({
 const stats = require('./src/services/factory.stats')(cache, cloudwatch, twitter);
 const chunk = require("lodash.chunk");
 
-module.exports.fetchTweetsToDownload = Sentry.AWSLambda.wrapHandler(async (event, context) => {
+module.exports.fetchTweetsToDownload = async (event, context) => {
     let lastTweetRetrieved = null;
     let count = 0;
     let mentions = await twitter.getMentions();
@@ -37,11 +37,14 @@ module.exports.fetchTweetsToDownload = Sentry.AWSLambda.wrapHandler(async (event
         await cache.setAsync('lastTweetRetrieved', lastTweetRetrieved);
     }
     return finish().success(`Published ${count} tweets`);
-}, {
-    timeoutWarningLimit: 5000,
-});
+};
 
-module.exports.sendDownloadLink = Sentry.AWSLambda.wrapHandler(async (event, context) => {
+(process.env.NODE_ENV === 'production') && (exports.fetchTweetsToDownload = Sentry.AWSLambda.wrapHandler(exports.fetchTweetsToDownload, {
+    timeoutWarningLimit: 5000,
+}));
+
+
+module.exports.sendDownloadLink = async (event, context) => {
     const tweets = sns.getPayloadFromSnsEvent(event);
     // The lookup endpoint only allows fetching 100 tweets at a time
     const chunks = chunk(tweets, 100);
@@ -58,9 +61,12 @@ module.exports.sendDownloadLink = Sentry.AWSLambda.wrapHandler(async (event, con
         return cloudwatch.logResults(results);
     }));
     return finish().success(`Processed ${tweets.length} tasks`);
-}, {
+};
+
+(process.env.NODE_ENV === 'production') && (exports.sendDownloadLink = Sentry.AWSLambda.wrapHandler(exports.sendDownloadLink, {
     timeoutWarningLimit: 5000,
-});
+}));
+
 
 module.exports.retryFailedTasks = async (event, context) => {
     const tweets = await cache.lrangeAsync('Fail', 0, -1);
@@ -73,7 +79,8 @@ module.exports.retryFailedTasks = async (event, context) => {
     return finish().success(`Sent ${tweets.length} tasks for retrying`);
 };
 
-module.exports.getDownloadsOrStaticFiles = Sentry.AWSLambda.wrapHandler(async (event, context) => {
+
+module.exports.getDownloadsOrStaticFiles = async (event, context) => {
     let username = event.pathParameters.username;
     username = typeof username == "string" ? username.replace(/\/$/, '') : username;
     switch (username) {
@@ -120,9 +127,12 @@ module.exports.getDownloadsOrStaticFiles = Sentry.AWSLambda.wrapHandler(async (e
             return finish().render('downloads', {username, downloads, settings});
         }
     }
-}, {
+};
+
+(process.env.NODE_ENV === 'production') && (exports.getDownloadsOrStaticFiles = Sentry.AWSLambda.wrapHandler(exports.getDownloadsOrStaticFiles, {
     timeoutWarningLimit: 2000,
-});
+}));
+
 
 module.exports.page = async (event, context) => {
     let page = event.pathParameters.page;
@@ -135,11 +145,19 @@ module.exports.page = async (event, context) => {
     }
 };
 
-module.exports.getHomePage = Sentry.AWSLambda.wrapHandler(async (event, context) => {
-    return finish().render('home');
-}, {
+(process.env.NODE_ENV === 'production') && (exports.page = Sentry.AWSLambda.wrapHandler(exports.page, {
     timeoutWarningLimit: 1000,
-});
+}));
+
+
+module.exports.getHomePage =async (event, context) => {
+    return finish().render('home');
+};
+
+(process.env.NODE_ENV === 'production') && (exports.getHomePage = Sentry.AWSLambda.wrapHandler(exports.getHomePage, {
+    timeoutWarningLimit: 1000,
+}));
+
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({event});
@@ -176,6 +194,9 @@ module.exports.startTwitterSignIn = async (event, context) => {
     };
     return redirect;
 };
+
+(process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
+
 
 module.exports.completeTwitterSignIn = async (event, context) => {
     if (event.queryStringParameters.action) {
@@ -224,3 +245,5 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     };
     return redirect;
 };
+
+(process.env.NODE_ENV === 'production') && (exports.completeTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.completeTwitterSignIn));

@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/shalvah/NotYourNass#readme",
   "dependencies": {
+    "@sentry/serverless": "^5.26.0",
     "aargh": "^1.2.0",
     "aws-sdk": "^2.568.0",
     "bluebird": "^3.7.1",

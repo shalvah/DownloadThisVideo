@@ -1,5 +1,11 @@
 'use strict';
 
+const Sentry = require("@sentry/serverless");
+
+Sentry.AWSLambda.init({
+    dsn: process.env.SENTRY_DSN,
+});
+
 const cache = require('./src/services/cache');
 
 const {finish, getRelativeTime} = require('./src/utils');
@@ -63,7 +69,7 @@ module.exports.retryFailedTasks = async (event, context) => {
     return finish().success(`Sent ${tweets.length} tasks for retrying`);
 };
 
-module.exports.getDownloadsOrStaticFiles = async (event, context) => {
+module.exports.getDownloadsOrStaticFiles = Sentry.AWSLambda.wrapHandler(async (event, context) => {
     let username = event.pathParameters.username;
     username = typeof username == "string" ? username.replace(/\/$/, '') : username;
     switch (username) {
@@ -110,7 +116,9 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
             return finish().render('downloads', {username, downloads, settings});
         }
     }
-};
+}, {
+    timeoutWarningLimit: 2000,
+});
 
 module.exports.page = async (event, context) => {
     let page = event.pathParameters.page;

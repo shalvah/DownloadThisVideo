@@ -161,7 +161,7 @@ module.exports.getHomePage = async (event, context) => {
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({event});
-    const username = event.queryStringParameters.username;
+    let {username, fbtoken: token, action} = event.queryStringParameters || {};
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
             // Unknown value of action in query params
@@ -178,7 +178,6 @@ module.exports.startTwitterSignIn = async (event, context) => {
         return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
     }
 
-    let {username, fbtoken: token, action} = event.queryStringParameters;
     const callbackUrl = process.env.TWITTER_CALLBACK_URL
         + `?username=${username}`
         + (action ? `&action=${action}` : '')

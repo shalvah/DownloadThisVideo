@@ -171,7 +171,7 @@ module.exports.startTwitterSignIn = async (event, context) => {
         // Missing fbtoken or username in query params
         if (username) {
             return finish().failHttp(
-                `Oops, something went wrong. Please go back to <a href="https://thisvid.space/${username}">https://thisvid.space/${username}</a> and try again.🙏`
+                `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
             );
         }
 
@@ -207,18 +207,25 @@ module.exports.startTwitterSignIn = async (event, context) => {
 
 
 module.exports.completeTwitterSignIn = async (event, context) => {
-    if (event.queryStringParameters.action) {
-        if (event.queryStringParameters.action !== "disable") {
+    console.log({event});
+    let {username, action} = event.queryStringParameters || {};
+    if (action) {
+        if (action !== "disable") {
             throw new Error('Unknown value of action in query params');
         }
-    } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
+    } else if (!username || !event.queryStringParameters.fbtoken) {
         // Missing fbtoken or username in query params
-        return finish().failHttp('Something went wrong. Please go back and try again.');
+        if (username) {
+            return finish().failHttp(
+                `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
+            );
+        }
+
+        return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
     }
 
     const fbToken = event.queryStringParameters.fbtoken;
     const userWereTryingToGainAccessFor = event.queryStringParameters.username;
-    const action = event.queryStringParameters.action;
     const oauthToken = event.queryStringParameters.oauth_token;
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 

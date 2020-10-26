@@ -150,7 +150,7 @@ module.exports.page = async (event, context) => {
 }));
 
 
-module.exports.getHomePage =async (event, context) => {
+module.exports.getHomePage = async (event, context) => {
     return finish().render('home');
 };
 
@@ -161,14 +161,21 @@ module.exports.getHomePage =async (event, context) => {
 
 module.exports.startTwitterSignIn = async (event, context) => {
     console.log({event});
+    const username = event.queryStringParameters.username;
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
             // Unknown value of action in query params
-            return finish().failHttp('Something went wrong. Please go back and try again.');
+            return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
         }
-    } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
+    } else if (!username || !event.queryStringParameters.fbtoken) {
         // Missing fbtoken or username in query params
-        return finish().failHttp('Something went wrong. Please go back and try again.');
+        if (username) {
+            return finish().failHttp(
+                `Oops, something went wrong. Please go back to <a href="https://thisvid.space/${username}">https://thisvid.space/${username}</a> and try again.🙏`
+            );
+        }
+
+        return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
     }
 
     let {username, fbtoken: token, action} = event.queryStringParameters;

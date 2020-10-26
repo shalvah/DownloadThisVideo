@@ -163,10 +163,12 @@ module.exports.startTwitterSignIn = async (event, context) => {
     console.log({event});
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
-            throw new Error('Unknown value of action in query params');
+            // Unknown value of action in query params
+            return finish().failHttp('Something went wrong. Please go back and try again.');
         }
     } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
-        throw new Error('Missing fbtoken or username in query params');
+        // Missing fbtoken or username in query params
+        return finish().failHttp('Something went wrong. Please go back and try again.');
     }
 
     let {username, fbtoken: token, action} = event.queryStringParameters;
@@ -204,7 +206,8 @@ module.exports.completeTwitterSignIn = async (event, context) => {
             throw new Error('Unknown value of action in query params');
         }
     } else if (!event.queryStringParameters.username || !event.queryStringParameters.fbtoken) {
-        throw new Error('Missing fbtoken or username in query params');
+        // Missing fbtoken or username in query params
+        return finish().failHttp('Something went wrong. Please go back and try again.');
     }
 
     const fbToken = event.queryStringParameters.fbtoken;
@@ -220,7 +223,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     if (actualUser !== userWereTryingToGainAccessFor) {
         return {
             statusCode: 403,
-            body: "Unauthorized."
+            body: "Not authorized to access that user."
         };
     }
 

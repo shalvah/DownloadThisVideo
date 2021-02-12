@@ -5,7 +5,7 @@ const Tracing = require("@sentry/tracing");
 
 Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 0.5,
+    tracesSampleRate: 0.4,
 });
 
 const cache = require('./src/services/cache');

@@ -1,9 +1,11 @@
 'use strict';
 
 const Sentry = require("@sentry/serverless");
+const Tracing = require("@sentry/tracing");
 
 Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 0.5,
 });
 
 const cache = require('./src/services/cache');
@@ -23,6 +25,8 @@ const stats = require('./src/services/factory.stats')(cache, cloudwatch, twitter
 const chunk = require("lodash.chunk");
 
 module.exports.fetchTweetsToDownload = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("fetchTweetsToDownload"));
+
     let lastTweetRetrieved = null;
     let count = 0;
     let mentions = await twitter.getMentions();
@@ -45,6 +49,8 @@ module.exports.fetchTweetsToDownload = async (event, context) => {
 
 
 module.exports.sendDownloadLink = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("sendDownloadLink"));
+
     const tweets = sns.getPayloadFromSnsEvent(event);
     // The lookup endpoint only allows fetching 100 tweets at a time
     const chunks = chunk(tweets, 100);
@@ -81,6 +87,8 @@ module.exports.retryFailedTasks = async (event, context) => {
 
 
 module.exports.getDownloadsOrStaticFiles = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("getDownloadsOrStaticFiles"));
+
     let username = event.pathParameters.username;
     username = typeof username == "string" ? username.replace(/\/$/, '') : username;
     switch (username) {
@@ -135,6 +143,8 @@ module.exports.getDownloadsOrStaticFiles = async (event, context) => {
 
 
 module.exports.page = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("page"));
+
     let page = event.pathParameters.page;
     switch (page) {
         case 'faqs':
@@ -151,6 +161,8 @@ module.exports.page = async (event, context) => {
 
 
 module.exports.getHomePage = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("getHomePage"));
+
     return finish().render('home');
 };
 
@@ -160,6 +172,8 @@ module.exports.getHomePage = async (event, context) => {
 
 
 module.exports.startTwitterSignIn = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
+
     console.log({event});
     let {username, fbtoken: token, action} = event.queryStringParameters || {};
     if (event.queryStringParameters.action) {
@@ -194,19 +208,20 @@ module.exports.startTwitterSignIn = async (event, context) => {
         throw new Error('OAuth callback not confirmed!');
     }
     await cache.setAsync(`requestTokenSecret-${username}`, requestTokenSecret, 'EX', 5 * 60);
-    const redirect = {
+    return {
         statusCode: 302,
         headers: {
             Location: 'https://api.twitter.com/oauth/authorize?screen_name=' + username + '&oauth_token=' + requestToken,
         }
     };
-    return redirect;
 };
 
 (process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
 
 
 module.exports.completeTwitterSignIn = async (event, context) => {
+    Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
+
     console.log({event});
     let {username, action} = event.queryStringParameters || {};
     if (action) {

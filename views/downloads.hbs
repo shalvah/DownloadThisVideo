@@ -2,20 +2,29 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ gTagId }}"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
 
-    gtag('config', '{{ gTagId }}');
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', '{{ gTagId }}');
     </script>
-    <script data-ad-client="{{ adCode }}" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script data-ad-client="{{ adCode }}" async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon-32x32.png" type="image/png" />
-    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon-16x16.png" type="image/png" />
-    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/apple-touch-icon.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon.ico"
+          type="image/x-icon"/>
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon-32x32.png"
+          type="image/png"/>
+    <link rel="icon" href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/favicon-16x16.png"
+          type="image/png"/>
+    <link rel="apple-touch-icon-precomposed" sizes="180x180"
+          href="https://raw.githubusercontent.com/shalvah/DownloadThisVideo/master/apple-touch-icon.png">
 
     <style>
         body {
@@ -103,17 +112,21 @@
 </script>
 
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- Testing Ad Unit -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="{{ adCode }}"
-     data-ad-slot="1262324327"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+{{#if downloads.length }}
+    <!-- Only show second ad slot if there's enough content, to avoid policy violation -->
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <!-- Testing Ad Unit -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="{{ adCode }}"
+         data-ad-slot="1262324327"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+{{/if}}
 
 <br>
 <footer style="margin-bottom: 0; padding-bottom: 0">

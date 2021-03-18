@@ -37,7 +37,6 @@ const finish = (cache = null) => {
 
     return {
         success(body) {
-            console.log(`Response: ${body}`);
             return body;
         },
 
@@ -45,7 +44,6 @@ const finish = (cache = null) => {
             'Access-Control-Allow-Origin': 'thisvid.space',
             "content-type": "application/json",
         }) {
-            console.log(`Response: ${JSON.stringify(body)}`);
             return {
                 statusCode: 200,
                 body: JSON.stringify(body),
@@ -54,7 +52,6 @@ const finish = (cache = null) => {
         },
 
         fail(body) {
-            console.log(`Fail response: ${body}`);
             return body;
         },
 
@@ -62,7 +59,6 @@ const finish = (cache = null) => {
             'Access-Control-Allow-Origin': 'thisvid.space',
             "content-type": "application/json",
         }) {
-            console.log(`Failure response: ${JSON.stringify(body)}`);
             return {
                 statusCode: 400,
                 body: JSON.stringify(body),

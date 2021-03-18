@@ -174,7 +174,7 @@ module.exports.getHomePage = async (event, context) => {
 module.exports.startTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
 
-    console.log({event});
+    Sentry.setContext('aws_incoming_event', event.queryStringParameters);
     let {username, fbtoken: token, action} = event.queryStringParameters || {};
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
@@ -222,7 +222,6 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
-    console.log({event});
     let {username, action} = event.queryStringParameters || {};
     if (action) {
         if (action !== "disable") {
@@ -269,7 +268,12 @@ module.exports.completeTwitterSignIn = async (event, context) => {
             notifications: true,
         };
     }
-    console.log("Saving settings for " + userWereTryingToGainAccessFor, JSON.stringify(data));
+    Sentry.addBreadcrumb({
+        category: "settings",
+        message: "Saving settings for user " + userWereTryingToGainAccessFor,
+        data,
+        level: Sentry.Severity.Debug,
+    });
     await cache.setAsync(`settings-${userWereTryingToGainAccessFor}`, JSON.stringify(data));
     const redirect = {
         statusCode: 302,

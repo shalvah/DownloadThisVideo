@@ -174,7 +174,6 @@ module.exports.getHomePage = async (event, context) => {
 module.exports.startTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
 
-    Sentry.setContext('aws_incoming_event:query', event.queryStringParameters);
     let {username, fbtoken: token, action} = event.queryStringParameters || {};
     if (event.queryStringParameters.action) {
         if (event.queryStringParameters.action !== "disable") {
@@ -222,6 +221,7 @@ module.exports.startTwitterSignIn = async (event, context) => {
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
+    Sentry.setContext('aws_incoming_event', event);
     let {username, action} = event.queryStringParameters || {};
     if (action) {
         if (action !== "disable") {

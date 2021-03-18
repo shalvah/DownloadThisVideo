@@ -6,7 +6,8 @@
     "lint": "eslint src handler.js",
     "test-init": "jasmine init",
     "test": "jasmine",
-    "invoke": "serverless invoke local"
+    "invoke": "serverless invoke local",
+    "local": "serverless offline --noPrependStageInUrl"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "mitm": "^1.7.0",
     "mock-require": "^3.0.3",
     "redis-mock": "^0.46.0",
-    "serverless-dotenv-plugin": "^2.1.1"
+    "serverless-dotenv-plugin": "^2.1.1",
+    "serverless-offline": "^6.8.0"
   }
 }

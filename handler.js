@@ -245,6 +245,9 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     const oauthVerifier = event.queryStringParameters.oauth_verifier;
 
     const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWereTryingToGainAccessFor}`);
+    Sentry.setContext('twitterauth', {
+        userWereTryingToGainAccessFor, oauthToken, requestTokenSecret, oauthVerifier
+    });
     const {oauth_token, oauth_token_secret, screen_name: actualUser} =
         await twitterSignIn.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
 

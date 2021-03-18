@@ -1,6 +1,7 @@
 service: DownloadThisVideo
 plugins:
 - serverless-dotenv-plugin
+- serverless-offline
 
 provider:
   name: aws

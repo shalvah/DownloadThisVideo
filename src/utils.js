@@ -40,28 +40,13 @@ const finish = (cache = null) => {
             return body;
         },
 
-        successHttp(body, headers = {
-            'Access-Control-Allow-Origin': 'thisvid.space',
-            "content-type": "application/json",
-        }) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify(body),
-                headers,
-            };
-        },
-
-        fail(body) {
-            return body;
-        },
-
         failHttp(body, headers = {
             'Access-Control-Allow-Origin': 'thisvid.space',
             "content-type": "text/html",
         }) {
             return {
                 statusCode: 400,
-                body: JSON.stringify(body),
+                body,
                 headers,
             };
         },

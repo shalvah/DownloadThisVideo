@@ -10,7 +10,7 @@ let client = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOSTNA
         if (options.error && options.error.code === 'ECONNREFUSED') {
             // End reconnecting on a specific error and flush all commands with
             // a individual error
-            return new Error('The server refused the connection');
+            return new Error('The Redis server refused the connection');
         }
         if (options.total_retry_time > 1000 * 10) {
             // End reconnecting after  and flush all commands

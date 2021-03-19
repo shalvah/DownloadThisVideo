@@ -175,20 +175,12 @@ module.exports.startTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
 
     let {username, fbtoken: token, action} = event.queryStringParameters || {};
-    if (action) {
-        if (action !== "disable") {
-            // Unknown value of action in query params
-            return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
-        }
-    } else if (!username || !token) {
-        // Missing fbtoken or username in query params
-        if (username) {
-            return finish().failHttp(
-                `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
-            );
-        }
+    const errorMessage = username
+        ? `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
+        : 'Oops, something went wrong. Please go back and try signing in again.🙏';
 
-        return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
+    if ((action !== "disable") || !username || !token) {
+        return finish().failHttp(errorMessage);
     }
 
     const callbackUrl = process.env.TWITTER_CALLBACK_URL
@@ -217,40 +209,40 @@ module.exports.startTwitterSignIn = async (event, context) => {
 
 (process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
 
-
 module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("completeTwitterSignIn"));
 
-    let {username, action} = event.queryStringParameters || {};
-    if (action) {
-        if (action !== "disable") {
-            throw new Error('Unknown value of action in query params');
-        }
-    } else if (!username || !event.queryStringParameters.fbtoken) {
-        // Missing fbtoken or username in query params
-        if (username) {
-            return finish().failHttp(
-                `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
-            );
-        }
+    let {
+        action,
+        username,
+        fbtoken: fbToken,
+        oauth_token: oauthToken,
+        oauth_verifier: oauthVerifier,
+    } = event.queryStringParameters || {};
 
-        return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
+    const errorMessage = username
+        ? `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
+        : 'Oops, something went wrong. Please go back and try signing in again.🙏';
+
+    if (action !== "disable" || !username || !fbToken || !oauthToken || !oauthVerifier) {
+        return finish().failHttp(errorMessage);
     }
 
-    const fbToken = event.queryStringParameters.fbtoken;
-    const userWereTryingToGainAccessFor = event.queryStringParameters.username;
-    const oauthToken = event.queryStringParameters.oauth_token;
-    const oauthVerifier = event.queryStringParameters.oauth_verifier;
+    const userWeNeedToGainAccessFor = event.queryStringParameters.username;
 
-    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWereTryingToGainAccessFor}`);
+    const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWeNeedToGainAccessFor}`);
+
+    if (!requestTokenSecret) {
+        return finish().failHttp(errorMessage);
+    }
+
     Sentry.setContext('twitterauth', {
-        userWereTryingToGainAccessFor, oauthToken, requestTokenSecret, oauthVerifier
+        userWeNeedToGainAccessFor, oauthToken, requestTokenSecret, oauthVerifier
     });
-    console.log('completeSignIn');
-    const {oauth_token, oauth_token_secret, screen_name: actualUser} =
+    const {screen_name: actualUser} =
         await twitterSignIn.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
 
-    if (actualUser !== userWereTryingToGainAccessFor) {
+    if (actualUser !== userWeNeedToGainAccessFor) {
         return {
             statusCode: 403,
             body: "Not authorized to access that user."
@@ -268,17 +260,19 @@ module.exports.completeTwitterSignIn = async (event, context) => {
             notifications: true,
         };
     }
+
     Sentry.addBreadcrumb({
         category: "settings",
-        message: "Saving settings for user " + userWereTryingToGainAccessFor,
+        message: "Saving settings for user " + userWeNeedToGainAccessFor,
         data,
         level: Sentry.Severity.Debug,
     });
-    await cache.setAsync(`settings-${userWereTryingToGainAccessFor}`, JSON.stringify(data));
+
+    await cache.setAsync(`settings-${userWeNeedToGainAccessFor}`, JSON.stringify(data));
     const redirect = {
         statusCode: 302,
         headers: {
-            Location: `http://${process.env.EXTERNAL_URL}/${userWereTryingToGainAccessFor}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
+            Location: `http://${process.env.EXTERNAL_URL}/${userWeNeedToGainAccessFor}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
         }
     };
     return redirect;

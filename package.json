@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/shalvah/NotYourNass#readme",
   "dependencies": {
-    "@sentry/serverless": "^6.1.0",
-    "@sentry/tracing": "^6.1.0",
+    "@sentry/serverless": "^6.2.2",
+    "@sentry/tracing": "^6.2.2",
     "aargh": "^1.4.0",
     "aws-sdk": "^2.568.0",
     "bluebird": "^3.7.1",

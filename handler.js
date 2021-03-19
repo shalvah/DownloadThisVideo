@@ -175,12 +175,12 @@ module.exports.startTwitterSignIn = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("startTwitterSignIn"));
 
     let {username, fbtoken: token, action} = event.queryStringParameters || {};
-    if (event.queryStringParameters.action) {
-        if (event.queryStringParameters.action !== "disable") {
+    if (action) {
+        if (action !== "disable") {
             // Unknown value of action in query params
             return finish().failHttp('Oops, something went wrong. Please go back and try again.🙏');
         }
-    } else if (!username || !event.queryStringParameters.fbtoken) {
+    } else if (!username || !token) {
         // Missing fbtoken or username in query params
         if (username) {
             return finish().failHttp(

@@ -57,12 +57,21 @@ const finish = (cache = null) => {
 
         failHttp(body, headers = {
             'Access-Control-Allow-Origin': 'thisvid.space',
-            "content-type": "application/json",
+            "content-type": "text/html",
         }) {
             return {
                 statusCode: 400,
                 body: JSON.stringify(body),
                 headers,
+            };
+        },
+
+        redirect(location) {
+            return {
+                statusCode: 302,
+                headers: {
+                    Location: location
+                },
             };
         },
 

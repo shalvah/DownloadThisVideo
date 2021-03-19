@@ -199,12 +199,8 @@ module.exports.startTwitterSignIn = async (event, context) => {
         throw new Error('OAuth callback not confirmed!');
     }
     await cache.setAsync(`requestTokenSecret-${username}`, requestTokenSecret, 'EX', 5 * 60);
-    return {
-        statusCode: 302,
-        headers: {
-            Location: 'https://api.twitter.com/oauth/authorize?screen_name=' + username + '&oauth_token=' + requestToken,
-        }
-    };
+
+    return finish().redirect('https://api.twitter.com/oauth/authorize?screen_name=' + username + '&oauth_token=' + requestToken);
 };
 
 (process.env.NODE_ENV === 'production') && (exports.startTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.startTwitterSignIn));
@@ -228,10 +224,8 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         return finish().failHttp(errorMessage);
     }
 
-    const userWeNeedToGainAccessFor = event.queryStringParameters.username;
-
+    const userWeNeedToGainAccessFor = username;
     const requestTokenSecret = await cache.getAsync(`requestTokenSecret-${userWeNeedToGainAccessFor}`);
-
     if (!requestTokenSecret) {
         return finish().failHttp(errorMessage);
     }
@@ -239,8 +233,18 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     Sentry.setContext('twitterauth', {
         userWeNeedToGainAccessFor, oauthToken, requestTokenSecret, oauthVerifier
     });
-    const {screen_name: actualUser} =
-        await twitterSignIn.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier);
+
+    let actualUser;
+    try {
+        actualUser = (await twitterSignIn.getAccessToken(oauthToken, requestTokenSecret, oauthVerifier)).screen_name;
+    } catch (e) {
+        if (e.message === "This feature is temporarily unavailable") {
+            // This error seems to happen intermittently from the Twitter API, or when the request access token endpoint is called more than once
+            return finish().failHttp(errorMessage);
+        }
+
+        throw e;
+    }
 
     if (actualUser !== userWeNeedToGainAccessFor) {
         return {
@@ -249,17 +253,9 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         };
     }
 
-    let data;
-    if (action === "disable") {
-        data = {
-            notifications: false,
-        };
-    } else {
-        data = {
-            fbToken,
-            notifications: true,
-        };
-    }
+    let data = (action === "disable")
+        ? {notifications: false}
+        : {fbToken, notifications: true};
 
     Sentry.addBreadcrumb({
         category: "settings",
@@ -269,13 +265,7 @@ module.exports.completeTwitterSignIn = async (event, context) => {
     });
 
     await cache.setAsync(`settings-${userWeNeedToGainAccessFor}`, JSON.stringify(data));
-    const redirect = {
-        statusCode: 302,
-        headers: {
-            Location: `http://${process.env.EXTERNAL_URL}/${userWeNeedToGainAccessFor}` + (action === "disable" ? '' : `?fbt=${fbToken}`)
-        }
-    };
-    return redirect;
+    return finish().redirect(`http://${process.env.EXTERNAL_URL}/${userWeNeedToGainAccessFor}` + (action === "disable" ? '' : `?fbt=${fbToken}`));
 };
 
 (process.env.NODE_ENV === 'production') && (exports.completeTwitterSignIn = Sentry.AWSLambda.wrapHandler(exports.completeTwitterSignIn));

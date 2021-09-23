@@ -1,6 +1,7 @@
+dist: focal
 language: node_js
 node_js:
-- 12
+- 14
 
 env:
 - SLS_DEBUG=* TWITTER_SCREEN_NAME=this_vid EXTERNAL_URL=thisvid.space FIREBASE_PROJECT_ID=downloadthisvideo-662ae TWITTER_CALLBACK_URL="https://thisvid.space/_/completetwittersignin"
@@ -19,12 +20,11 @@ stages:
 jobs:
   include:
   - stage: deploy
-    before_script:
-      - curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-      - unzip awscli-bundle.zip
-      - ./awscli-bundle/install -b ~/bin/aws
-      - export PATH=~/bin:$PATH
-    script: |
+    script: 
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    - unzip awscliv2.zip
+    - sudo ./aws/install
+    - |
       aws --region us-east-1 s3 cp \
       s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
       ./downloadthisvideo-serviceaccount.json && \

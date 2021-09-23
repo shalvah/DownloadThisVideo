@@ -64,8 +64,8 @@ package:
   - "*.ico"
   - .*
   - .*/**
-  - awscli-bundle.zip
-  - awscli-bundle/**
+  - awscliv2.zip
+  - aws/**
   - spec/**
   - assets/*.png
 

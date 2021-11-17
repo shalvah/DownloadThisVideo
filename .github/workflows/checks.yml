@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm ci
+      - run: npm ci --include=dev
       - name: Tests
         run: NODE_ENV=development npm run test
 
@@ -36,6 +36,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm ci
+      - run: npm ci --include=dev
       - name: Lint
         run: npm run lint

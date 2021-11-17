@@ -14,6 +14,11 @@ env:
   EXTERNAL_URL: thisvid.space
   FIREBASE_PROJECT_ID: downloadthisvideo-662ae
   TWITTER_CALLBACK_URL: "https://thisvid.space/_/completetwittersignin"
+
+  AD_CODE: ${{ secrets.AD_CODE }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  GTAG_ID: ${{ secrets.GTAG_ID }}
   TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
   TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
   TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
@@ -22,10 +27,6 @@ env:
   REDIS_PORT: ${{ secrets.REDIS_PORT }}
   REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  GTAG_ID: ${{ secrets.GTAG_ID }}
-  AD_CODE: ${{ secrets.AD_CODE }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   deploy-prod:
@@ -38,12 +39,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm ci --include=dev
-      - run: |
+      - run: npm i -g serverless && npm ci --include=dev
+      - name: Deploy that shit
+        run: |
           aws --version
           aws --region us-east-1 s3 cp \
             s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
             ./downloadthisvideo-serviceaccount.json && \
             aws --region us-east-1 s3 cp \
             s3://shalvah-creds/thisvid-analytics-serviceaccount.json  \
-            ./thisvid-analytics-serviceaccount.json && sls deploy
+            ./thisvid-analytics-serviceaccount.json && \
+            serverless deploy

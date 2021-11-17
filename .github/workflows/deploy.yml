@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Checks"]
+    branches: [master]
+    types:
+      - completed
+  push:
+    branches: [master]
+
+env:
+  NODE_ENV: production
+  SLS_DEBUG: *
+  TWITTER_SCREEN_NAME: this_vid
+  EXTERNAL_URL: thisvid.space
+  FIREBASE_PROJECT_ID: downloadthisvideo-662ae
+  TWITTER_CALLBACK_URL: "https://thisvid.space/_/completetwittersignin"
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    name: Deploy to prod
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+          aws --region us-east-1 s3 cp \
+            s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
+            ./downloadthisvideo-serviceaccount.json && \
+            aws --region us-east-1 s3 cp \
+            s3://shalvah-creds/thisvid-analytics-serviceaccount.json  \
+            ./thisvid-analytics-serviceaccount.json && sls deploy

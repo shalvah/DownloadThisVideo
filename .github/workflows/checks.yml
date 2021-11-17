@@ -1,0 +1,41 @@
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+env:
+  NODE_ENV: production
+  SLS_DEBUG: *
+  TWITTER_SCREEN_NAME: this_vid
+  EXTERNAL_URL: thisvid.space
+  FIREBASE_PROJECT_ID: downloadthisvideo-662ae
+  TWITTER_CALLBACK_URL: "https://thisvid.space/_/completetwittersignin"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Tests (Node.js 14.18.0)
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.18.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.18.0
+      - run: npm ci
+      - name: Tests
+        run: NODE_ENV=development npm run test
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint (Node.js 14.18.0)
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.18.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.18.0
+      - run: npm ci
+      - name: Lint
+        run: npm run lint

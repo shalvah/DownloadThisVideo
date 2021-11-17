@@ -4,7 +4,6 @@
   "main": "handler.js",
   "scripts": {
     "lint": "eslint src handler.js",
-    "test-init": "jasmine init",
     "test": "jasmine",
     "invoke": "serverless invoke local",
     "local": "serverless offline --noPrependStageInUrl"

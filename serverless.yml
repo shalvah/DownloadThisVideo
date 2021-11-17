@@ -1,4 +1,5 @@
 service: DownloadThisVideo
+frameworkVersion: "^2.0.0"
 plugins:
 - serverless-dotenv-plugin
 - serverless-offline

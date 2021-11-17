@@ -42,7 +42,7 @@ const finish = (cache = null) => {
 
         failHttp(body, headers = {
             'Access-Control-Allow-Origin': 'thisvid.space',
-            "content-type": "text/html",
+            "content-type": "text/html; charset=UTF-8",
         }) {
             return {
                 statusCode: 400,

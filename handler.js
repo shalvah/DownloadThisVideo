@@ -177,7 +177,11 @@ module.exports.startTwitterSignIn = async (event, context) => {
         ? `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
         : 'Oops, something went wrong. Please go back and try signing in again.🙏';
 
-    if ((action !== "disable") || !username || !token) {
+    if (action && (action !== "disable")) {
+        return finish().failHttp(errorMessage);
+    }
+
+    if (!username || !token) {
         return finish().failHttp(errorMessage);
     }
 

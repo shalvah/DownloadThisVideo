@@ -11,7 +11,7 @@ on:
 
 env:
   NODE_ENV: production
-  SLS_DEBUG: *
+  SLS_DEBUG: "*"
   TWITTER_SCREEN_NAME: this_vid
   EXTERNAL_URL: thisvid.space
   FIREBASE_PROJECT_ID: downloadthisvideo-662ae

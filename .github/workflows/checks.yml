@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  NODE_ENV: production
+  NODE_ENV: development
   SLS_DEBUG: "*"
   TWITTER_SCREEN_NAME: this_vid
   EXTERNAL_URL: thisvid.space
@@ -23,9 +23,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm ci --include=dev
+      - run: npm i
       - name: Tests
-        run: NODE_ENV=development npm run test
+        run: npm run test
 
   lint:
     runs-on: ubuntu-latest
@@ -36,6 +36,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm ci --include=dev
+      - run: npm i
       - name: Lint
         run: npm run lint

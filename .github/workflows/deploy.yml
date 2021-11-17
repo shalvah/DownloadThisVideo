@@ -28,6 +28,7 @@ jobs:
           node-version: 14.18.0
       - run: npm ci --include=dev
       - run: |
+          aws --version
           aws --region us-east-1 s3 cp \
             s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
             ./downloadthisvideo-serviceaccount.json && \

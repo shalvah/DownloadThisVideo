@@ -39,7 +39,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm i -g serverless && npm ci --include=dev
+      - run: npm i -g serverless && npm i
       - name: Deploy that shit
         run: |
           aws --version

@@ -6,8 +6,6 @@ on:
     branches: [master]
     types:
       - completed
-  push:
-    branches: [master]
 
 env:
   NODE_ENV: production
@@ -30,9 +28,6 @@ jobs:
           node-version: 14.18.0
       - run: npm ci --include=dev
       - run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
           aws --region us-east-1 s3 cp \
             s3://shalvah-creds/downloadthisvideo-serviceaccount.json  \
             ./downloadthisvideo-serviceaccount.json && \

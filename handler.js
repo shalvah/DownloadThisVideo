@@ -193,6 +193,14 @@ module.exports.startTwitterSignIn = async (event, context) => {
         + `?username=${username}`
         + (action ? `&action=${action}` : '')
         + (token ? `&fbtoken=${token}` : '');
+
+    Sentry.setContext('twitterauth', {
+        callbackUrl,
+        tck: TWITTER_CONSUMER_KEY,
+        tcs: TWITTER_CONSUMER_SECRET,
+        tat: TWITTER_ACCESS_TOKEN,
+        tats: TWITTER_ACCESS_TOKEN_SECRET,
+    });
     const {
         oauth_token: requestToken,
         oauth_token_secret: requestTokenSecret,

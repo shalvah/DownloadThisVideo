@@ -1,11 +1,9 @@
 name: Deploy
 
 on:
-  workflow_run:
-    workflows: ["Checks"]
+  push:
     branches: [master]
-    types:
-      - completed
+
 
 env:
   NODE_ENV: production

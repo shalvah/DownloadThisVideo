@@ -177,11 +177,15 @@ module.exports.startTwitterSignIn = async (event, context) => {
         ? `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
         : 'Oops, something went wrong. Please go back and try signing in again.🙏';
 
-    if (action && (action !== "disable")) {
+    if (!username) {
         return finish().failHttp(errorMessage);
     }
 
-    if (!username || !token) {
+    if (action) {
+        if (action !== "disable") {
+            return finish().failHttp(errorMessage);
+        }
+    } else if (!token) {
         return finish().failHttp(errorMessage);
     }
 
@@ -222,11 +226,15 @@ module.exports.completeTwitterSignIn = async (event, context) => {
         ? `Oops, something went wrong. Please go back to <a href="https://${process.env.EXTERNAL_URL}/${username}">https://${process.env.EXTERNAL_URL}/${username}</a> and try again.🙏`
         : 'Oops, something went wrong. Please go back and try signing in again.🙏';
 
-    if (action && (action !== "disable")) {
+    if (action) {
+        if (action !== "disable") {
+            return finish().failHttp(errorMessage);
+        }
+    } else if (!fbToken) {
         return finish().failHttp(errorMessage);
     }
 
-    if (!username || !fbToken || !oauthToken || !oauthVerifier) {
+    if (!username || !oauthToken || !oauthVerifier) {
         return finish().failHttp(errorMessage);
     }
 

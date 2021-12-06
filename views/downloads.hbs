@@ -80,27 +80,30 @@
         <br>
     {{/each}}
 
-    <div id="switch_prompt" style="display: none;">
-        <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
-            turn off notifications entirely.</small><br>
-        <button onclick="requestPermission(this)">Switch notifications to this device</button>
-        <button onclick="turnOffNotifications()">Disable all notifications</button>
-        <br>
-    </div>
 
-    <div id="enable_prompt" style="display: none;">
-        <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you'd like.💃
-            <a
-                    href="/p/faq/#notifications">See the FAQ for details.</a></small>
-        <br>
-        <button onclick="requestPermission(this)">Enable notifications</button>
-        <br>
-    </div>
+    <div id="notifications-buttons">
+        <div id="switch_prompt" style="display: none;">
+            <small>You've got push notifications for downloads enabled on another device. You can switch to this one, or
+                turn off notifications entirely.</small><br>
+            <button onclick="requestPermission(this)">Switch notifications to this device</button>
+            <button onclick="turnOffNotifications()">Disable all notifications</button>
+            <br>
+        </div>
 
-    <div id="disable_prompt" style="display: none;">
-        <small>You've got push notifications for downloads enabled on this device. </small><br>
-        <button onclick="turnOffNotifications()">Disable all notifications</button>
-        <br>
+        <div id="enable_prompt" style="display: none;">
+            <small>Psst! @this_vid can send you a push notification on your device for new downloads, if you'd like.💃
+                <a
+                        href="/p/faq/#notifications">See the FAQ for details.</a></small>
+            <br>
+            <button onclick="requestPermission(this)">Enable notifications</button>
+            <br>
+        </div>
+
+        <div id="disable_prompt" style="display: none;">
+            <small>You've got push notifications for downloads enabled on this device. </small><br>
+            <button onclick="turnOffNotifications()">Disable all notifications</button>
+            <br>
+        </div>
     </div>
 
     <div id="twittersignin" style="display: none;">
@@ -239,6 +242,11 @@
 <script>
     function initializeAndConfigurePushNotifications() {
 
+        function notificationsNotSupported(deviceOrBrowser) {
+            document.querySelector("#notifications-buttons").innerHTML =
+                    `Sorry, push notifications aren't supported on this ${deviceOrBrowser}😟. We recommend Google Chrome or Firefox on Android, Windows, macOS or Linux`;
+        }
+
         if (!("serviceWorker" in navigator)) {
             console.log("Service workers not supported.");
             return;
@@ -247,12 +255,14 @@
         const os = getOS();
         if ([OSes.iOS, OSes.unknown].includes(os)) {
             console.log("Not supported on " + os);
+            notificationsNotSupported(`OS (${os})`);
             return;
         }
 
         const browser = getBrowser();
         if ([browsers.safari, browsers.IE, browsers.unknown].includes(browser)) {
             console.log("Not supported on " + browser);
+            notificationsNotSupported(`browser (${browser})`);
             return;
         }
 

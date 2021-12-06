@@ -109,12 +109,19 @@ module.exports = (cache) => {
         return not(haveIRepliedToTweetAlready)(id, await getMyTweets());
     };
 
-    const fetchTweet = (tweetId) => {
+    const fetchTweet = async (tweetId) => {
+        if (await cache.getAsync('no-statusesShow')) {
+            return null;
+        }
         return t.get(`statuses/show`, {
             id: tweetId,
             tweet_mode: 'extended',
         }).then(r => r.data)
-            .catch(e => wrapTwitterErrors('statuses/show', e));
+            .catch(e => wrapTwitterErrors('statuses/show', e))
+            .type([errors.RateLimited], async (e) => {
+                console.log(`Error: ${e.code}, backing off for 10 minutes`);
+                await cache.setAsync('no-statusesShow', 1, 'EX', 60 * 10);
+            });
     };
 
     const getFollowersCount = () => {

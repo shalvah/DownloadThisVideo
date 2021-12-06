@@ -1,10 +1,11 @@
 name: Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Checks"]
     branches: [master]
-
-
+    types:
+      - completed
 env:
   NODE_ENV: production
   SLS_DEBUG: "*"
@@ -30,13 +31,14 @@ jobs:
   deploy-prod:
     runs-on: ubuntu-latest
     name: Deploy to prod
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 14.18.0
         uses: actions/setup-node@v2
         with:
           node-version: 14.18.0
-      - run: npm i -g serverless && npm ci --production=false
+      - run: npm i -g serverless@2 && npm ci --production=false
       - name: Deploy that shit
         run: |
           aws --version

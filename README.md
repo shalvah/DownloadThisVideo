@@ -1,6 +1,8 @@
 # DownloadThisVideo
 Easily download videos/GIFs off Twitter. Mention the bot (@this_vid) in a reply to the tweet containing the video, and it'll reply with a download link in a few minutes.
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 ![](./this-vid.png)
 
 ## How this works

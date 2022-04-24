@@ -1,13 +1,4 @@
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ gTagId }}"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', '{{ gTagId }}');
-    </script>
     <script data-ad-client="{{ adCode }}" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +28,7 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', Calibri, sans-serif;
-            padding: 20px;
+            padding: 20px 40px;
             display: flex;
             flex-direction: column;
             font-size: 1.5em;
@@ -88,33 +79,32 @@
 
 <body>
 <div class="content">
-    <h2>Download videos and GIFs off Twitter</h2>
+    <h2>@this_vid is no more😢</h2>
     <div class="list-item">
-        🔍 Find a tweet containing a video or GIF.
+        On April 4, 2022, Twitter suspended @this_vid for supposed violation of the Twitter Rules (there weren't any!)
+    </div>
+    <br>
+    <!-- Thanks to Twemoji (and boo to Microsoft for not having flag emojis in Win10) -->
+    <div class="list-item">
+        Thank you to everyone who's used this little project from Lagos, Nigeria<i class="emoji-flag-nigeria"></i> over the past four years.💙
     </div>
     <div class="list-item">
-        💬 Mention <a href="https://twitter.com/this_vid">@this_vid</a> in a reply to the tweet.
-    </div>
-    <div class="list-item">
-        ⌚ Give it a minute, and @this_vid will reply with a link to your download. 🔗<br>
-        <div class="small-text">PS: Twitter has a limit on the number of
-            tweets we can post, so if you don't see a reply after 2 minutes, try checking
-            thisvid.space/your-Twitter-handle for your download.
-        </div>
+        If you need a replacement, look in the comments of any video. There are now many similar video downloader bots available, so chances are that you'll find a few.
     </div>
 
     <br>
-    <b>Looking for your downloads?👀</b>
-    <form onsubmit="event.preventDefault(); goToDownloads();">
-        <input name="username" placeholder="Your Twitter username">
-        <button type="submit">Take me there</button>
-    </form>
-
-    <script>
-        function goToDownloads() {
-            window.location = document.querySelector('input[name=username]').value;
-        }
-    </script>
+    <div style="font-size: smaller;">
+        You can check out
+        <a href="https://github.com/shalvah/DownloadThisVideo">my other open-source projects</a>,
+        like <a href="https://volgnie.com/">my newest one</a> for people who don't like having a lot of followers.</a>
+    </div>
+    <br>
+    <div class="list-item">
+        Farewell!
+    </div>
+    <div class="list-item">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/_HVCB9hW6kg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
 </div>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -139,23 +129,4 @@
     (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 <br>
-<footer style="margin-bottom: 0; padding-bottom: 0">
-    <!-- Thanks to Twemoji (and boo to Microsoft for not having flag emojis in Win10) -->
-    <div>
-        <small style="font-size: 0.7em;">
-            Made in Lagos, Nigeria<i class="emoji-flag-nigeria"></i>
-        </small>
-    </div>
-
-    <br>
-    <div>
-        <small style="font-size: 0.7em;">
-            <a href="https://www.patreon.com/shalvah">Support @this_vid</a>
-            &nbsp;|&nbsp;
-            <a href="/p/faq">See our FAQ</a>
-            &nbsp;|&nbsp;
-            <a href="https://github.com/shalvah/DownloadThisVideo">Check out the source code</a>
-        </small>
-    </div>
-</footer>
 </body>

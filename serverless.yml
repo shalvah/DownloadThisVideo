@@ -71,64 +71,9 @@ package:
   - assets/*.png
 
 functions:
-  fetchTweetsToDownload:
-    handler: handler.fetchTweetsToDownload
-    events:
-    - schedule: rate(1 minute)
-
-  retryFailedTasks:
-    handler: handler.retryFailedTasks
-
-  sendDownloadLink:
-    handler: handler.sendDownloadLink
-    events:
-    - sns: newMention
-
-  startTwitterSignIn:
-    handler: handler.startTwitterSignIn
-    events:
-      - http:
-          path: /_/starttwittersignin
-          method: get
-
-  completeTwitterSignIn:
-    handler: handler.completeTwitterSignIn
-    events:
-      - http:
-          path: /_/completetwittersignin
-          method: get
-          request:
-            parameters:
-              querystrings:
-                username: true
-                action: false
-                fbtoken: false
-
-  page:
-    handler: handler.page
-    events:
-      - http:
-          path: /p/{page}
-          method: get
-          request:
-            parameters:
-              paths:
-                page: true
-
-  getDownloadsOrStaticFiles:
-    handler: handler.getDownloadsOrStaticFiles
-    events:
-    - http:
-        path: /{username}
-        method: get
-        request:
-          parameters:
-            paths:
-              username: true
-
   getHomePage:
     handler: handler.getHomePage
     events:
     - http:
-        path: /
+        path: /{any+}
         method: get

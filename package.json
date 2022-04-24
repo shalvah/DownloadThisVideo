@@ -5,8 +5,8 @@
   "scripts": {
     "lint": "eslint src handler.js",
     "test": "jasmine",
-    "invoke": "serverless invoke local",
-    "local": "serverless offline --noPrependStageInUrl"
+    "invoke": "npx serverless invoke local",
+    "local": "npx serverless offline --noPrependStageInUrl"
   },
   "repository": {
     "type": "git",
@@ -43,7 +43,8 @@
     "mitm": "^1.7.0",
     "mock-require": "^3.0.3",
     "redis-mock": "^0.46.0",
+    "serverless": "^2.72.3",
     "serverless-dotenv-plugin": "^2.1.1",
-    "serverless-offline": "^6.8.0"
+    "serverless-offline": "^8.7.0"
   }
 }

@@ -10,7 +10,6 @@ env:
   EXTERNAL_URL: thisvid.space
   FIREBASE_PROJECT_ID: downloadthisvideo-662ae
   TWITTER_CALLBACK_URL: "https://thisvid.space/_/completetwittersignin"
-  AD_CODE: ${{ secrets.AD_CODE }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}

@@ -6,6 +6,8 @@ Sentry.AWSLambda.init({
     dsn: process.env.SENTRY_DSN,
 });
 
+const { finish } = require('./src/utils');
+
 module.exports.getHomePage = async (event, context) => {
     Sentry.configureScope(scope => scope.setTransactionName("getHomePage"));
 
